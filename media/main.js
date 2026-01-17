@@ -22,6 +22,14 @@
 
   const FOLDER_COLOR = '#4a9eff';
 
+  // Git status colors - VISUAL GIT INTEGRATION!
+  const GIT_STATUS_COLORS = {
+    modified: '#e2c08d',    // Yellow/orange - modified files
+    untracked: '#73c991',   // Green - new untracked files
+    staged: '#6fce6f',      // Bright green - staged files
+    deleted: '#f48771'      // Red - deleted files
+  };
+
   // ========================================
   // ICON MAPPING SYSTEM - Making it USEFUL!
   // ========================================
@@ -413,13 +421,22 @@
           const isExpanded = node.children && expandedFolders.has(node.path);
           const ext = !node.children && node.name.includes('.') ? node.name.split('.').pop().toUpperCase() : null;
           
+          // Git status badge
+          const gitBadge = node.gitStatus ? {
+            modified: '<span style="color: #e2c08d; background: rgba(226, 192, 141, 0.15); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">● MODIFIED</span>',
+            untracked: '<span style="color: #73c991; background: rgba(115, 201, 145, 0.15); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">● UNTRACKED</span>',
+            staged: '<span style="color: #6fce6f; background: rgba(111, 206, 111, 0.15); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">● STAGED</span>',
+            deleted: '<span style="color: #f48771; background: rgba(244, 135, 113, 0.15); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">● DELETED</span>'
+          }[node.gitStatus] : '';
+          
           return `
             <div style="background: rgba(0,0,0,0.95); padding: 12px; border-radius: 8px; color: white; max-width: 350px; font-family: 'Segoe UI', sans-serif; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
               <strong style="font-size: 15px; color: #4a9eff;">${node.name}</strong><br/>
               <div style="margin-top: 8px; font-size: 12px; line-height: 1.6;">
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <span style="color: #fbbf24; font-weight: 500;">${type.toUpperCase()}</span>
                   ${ext ? `<span style="color: #a78bfa; background: rgba(167, 139, 250, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;">${ext}</span>` : ''}
+                  ${gitBadge}
                   ${node.children ? `<span style="color: #4ade80; margin-left: auto;">${isExpanded ? 'Expanded' : 'Click to expand'}</span>` : ''}
                 </div>
                 <div style="margin-top: 6px;">
@@ -450,12 +467,19 @@
         // Replace boring colored balls with recognizable file/folder icons
         .nodeThreeObject(node => createNodeSprite(node))
         
-        // Color by file type - instant recognition (kept for backwards compat but sprites override)
+        // Color by file type and Git status - instant recognition
         .nodeColor(node => {
-          if (node.highlighted) return '#ff00ff'; // Search results
-          if (node.modified) return '#ff6b6b'; // Git modified
+          if (node.highlighted) return '#ff00ff'; // Search results (highest priority)
+          
+          // Git status colors (high priority)
+          if (node.gitStatus) {
+            return GIT_STATUS_COLORS[node.gitStatus] || FILE_TYPE_COLORS.default;
+          }
+          
+          // Folder color
           if (node.children) return FOLDER_COLOR;
           
+          // File type color
           const ext = getFileExtension(node.name);
           return FILE_TYPE_COLORS[ext] || FILE_TYPE_COLORS.default;
         })

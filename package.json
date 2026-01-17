@@ -2,7 +2,7 @@
   "name": "strukt",
   "displayName": "Strukt - Interactive 3D Project Map",
   "description": "Visualize your workspace as a stunning 3D interactive force-directed graph with 80+ file icons, smart search, and expandable folders",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "publisher": "sankalpasarkar",
   "author": {
     "name": "Sankalpa Sarkar",
@@ -86,7 +86,7 @@
       "properties": {
         "strukt.maxDepth": {
           "type": "number",
-          "default": 3,
+          "default": 10,
           "description": "Maximum folder depth to visualize (lower = better performance)"
         },
         "strukt.excludePatterns": {
@@ -99,6 +99,11 @@
             "**/.vscode/**"
           ],
           "description": "Glob patterns to exclude from visualization"
+        },
+        "strukt.showGitStatus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Git status indicators (modified, untracked, staged files)"
         },
         "strukt.showFileExtensions": {
           "type": "boolean",

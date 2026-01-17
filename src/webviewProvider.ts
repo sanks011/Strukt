@@ -102,11 +102,12 @@ export class ProjectMapProvider {
     const config = vscode.workspace.getConfiguration('strukt');
     const maxDepth = config.get<number>('maxDepth', 10);
     const excludePatterns = config.get<string[]>('excludePatterns', []);
+    const showGitStatus = config.get<boolean>('showGitStatus', true);
     const layout = config.get<string>('layout', 'breadthfirst');
 
-    console.log('[Strukt] Config - maxDepth:', maxDepth, 'excludePatterns:', excludePatterns);
+    console.log('[Strukt] Config - maxDepth:', maxDepth, 'showGitStatus:', showGitStatus);
 
-    const tree = await this.treeBuilder.buildTree(maxDepth, excludePatterns);
+    const tree = await this.treeBuilder.buildTree(maxDepth, excludePatterns, showGitStatus);
     console.log('[Strukt] Tree object:', tree);
 
     // Only send data via postMessage - don't recreate HTML!

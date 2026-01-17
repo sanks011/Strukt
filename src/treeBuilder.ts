@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { GitService, GitStatus } from './gitService';
 
 export interface FileNode {
   name: string;
@@ -7,11 +8,17 @@ export interface FileNode {
   path: string;
   size?: number;
   children?: FileNode[];
+  gitStatus?: 'modified' | 'untracked' | 'staged' | 'deleted';
 }
 
 export class FileTreeBuilder {
+  private gitService: GitService;
+
+  constructor() {
+    this.gitService = new GitService();
+  }
   
-  public async buildTree(maxDepth: number, excludePatterns: string[]): Promise<FileNode> {
+  public async buildTree(maxDepth: number, excludePatterns: string[], includeGitStatus: boolean = true): Promise<FileNode> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     
     console.log('[Strukt] Building tree with maxDepth:', maxDepth, 'excludePatterns:', excludePatterns);
@@ -27,9 +34,12 @@ export class FileTreeBuilder {
       };
     }
 
+    // Get Git status if enabled
+    const gitStatus = includeGitStatus ? await this.gitService.getGitStatus() : null;
+
     const rootFolder = workspaceFolders[0];
     console.log('[Strukt] Root folder:', rootFolder.uri.fsPath);
-    const tree = await this.buildNode(rootFolder.uri, '', 0, maxDepth, excludePatterns);
+    const tree = await this.buildNode(rootFolder.uri, '', 0, maxDepth, excludePatterns, gitStatus);
     console.log('[Strukt] Tree built with', this.countNodes(tree), 'nodes');
     return tree;
   }
@@ -49,7 +59,8 @@ export class FileTreeBuilder {
     relativePath: string,
     currentDepth: number,
     maxDepth: number,
-    excludePatterns: string[]
+    excludePatterns: string[],
+    gitStatus: GitStatus | null
   ): Promise<FileNode> {
     
     const stat = await vscode.workspace.fs.stat(uri);
@@ -66,12 +77,22 @@ export class FileTreeBuilder {
     }
 
     if (stat.type === vscode.FileType.File) {
-      return {
+      const fileNode: FileNode = {
         name,
         type: 'file',
         path: relativePath,
         size: stat.size
       };
+
+      // Add git status if available
+      if (gitStatus) {
+        const status = this.gitService.getFileStatus(uri.fsPath, gitStatus);
+        if (status) {
+          fileNode.gitStatus = status;
+        }
+      }
+
+      return fileNode;
     }
 
     // It's a directory
@@ -99,7 +120,8 @@ export class FileTreeBuilder {
           childRelativePath,
           currentDepth + 1,
           maxDepth,
-          excludePatterns
+          excludePatterns,
+          gitStatus
         );
       });
 
