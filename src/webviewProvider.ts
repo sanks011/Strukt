@@ -146,8 +146,8 @@ export class ProjectMapProvider {
   
   <div id="controls">
     <div class="control-group">
-      <button id="fit" title="Fit to Screen" style="padding: 6px 10px; font-size: 12px;"><i data-feather="maximize"></i></button>
-      <button id="reset" title="Reset View" style="padding: 6px 10px; font-size: 12px;"><i data-feather="rotate-ccw"></i></button>
+      <button id="fit" title="Fit to Screen" style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px;"><i data-feather="maximize"></i> <span>Fit to Screen</span></button>
+      <button id="reset" title="Reset View" style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px;"><i data-feather="rotate-ccw"></i> <span>Reset View</span></button>
     </div>
     
     <div class="search-box">

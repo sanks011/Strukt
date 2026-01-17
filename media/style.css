@@ -1,10 +1,36 @@
+/* ---- reset ---- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Feather Icons Sizing */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-editor-foreground, #d4d4d4);
+  position: relative;
+}
+
+/* ---- canvas ---- */
+canvas {
+  display: block;
+  vertical-align: bottom;
+}
+
+/* ---- particles.js container ---- */
+#particles-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.4;
+  background-color: transparent;
+}
+
+/* ---- Feather Icons Sizing ---- */
 .feather {
   width: 16px;
   height: 16px;
@@ -46,15 +72,7 @@ button .feather {
   height: 14px;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden;
-  background-color: var(--vscode-editor-background, #1e1e1e);
-  color: var(--vscode-editor-foreground, #d4d4d4);
-  position: relative;
-}
-
-#particles-bg {
+/* ---- 3D Graph Container ---- */#particles-bg {
   position: absolute;
   width: 100%;
   height: 100%;

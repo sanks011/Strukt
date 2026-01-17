@@ -79,6 +79,8 @@
     yaml: 'vscode-icons:file-type-yaml',
     yml: 'vscode-icons:file-type-yaml',
     toml: 'vscode-icons:file-type-toml',
+    csv: 'vscode-icons:file-type-excel',
+    tsv: 'vscode-icons:file-type-excel',
     
     // Shell
     sh: 'vscode-icons:file-type-shell',
@@ -103,6 +105,51 @@
     lua: 'vscode-icons:file-type-lua',
     r: 'vscode-icons:file-type-r',
     
+    // Module types
+    mjs: 'vscode-icons:file-type-js-official',
+    cjs: 'vscode-icons:file-type-js-official',
+    
+    // Images
+    png: 'vscode-icons:file-type-image',
+    jpg: 'vscode-icons:file-type-image',
+    jpeg: 'vscode-icons:file-type-image',
+    gif: 'vscode-icons:file-type-image',
+    webp: 'vscode-icons:file-type-image',
+    svg: 'vscode-icons:file-type-svg',
+    ico: 'vscode-icons:file-type-favicon',
+    bmp: 'vscode-icons:file-type-image',
+    tiff: 'vscode-icons:file-type-image',
+    
+    // Fonts
+    ttf: 'vscode-icons:file-type-font',
+    otf: 'vscode-icons:file-type-font',
+    woff: 'vscode-icons:file-type-font',
+    woff2: 'vscode-icons:file-type-font',
+    eot: 'vscode-icons:file-type-font',
+    
+    // Documents
+    pdf: 'vscode-icons:file-type-pdf',
+    doc: 'vscode-icons:file-type-word',
+    docx: 'vscode-icons:file-type-word',
+    xls: 'vscode-icons:file-type-excel',
+    xlsx: 'vscode-icons:file-type-excel',
+    ppt: 'vscode-icons:file-type-powerpoint',
+    pptx: 'vscode-icons:file-type-powerpoint',
+    
+    // Archives
+    zip: 'vscode-icons:file-type-zip',
+    rar: 'vscode-icons:file-type-zip',
+    tar: 'vscode-icons:file-type-zip',
+    gz: 'vscode-icons:file-type-zip',
+    '7z': 'vscode-icons:file-type-zip',
+    
+    // Video/Audio
+    mp4: 'vscode-icons:file-type-video',
+    avi: 'vscode-icons:file-type-video',
+    mov: 'vscode-icons:file-type-video',
+    mp3: 'vscode-icons:file-type-audio',
+    wav: 'vscode-icons:file-type-audio',
+    
     // Special files
     txt: 'vscode-icons:file-type-text',
     log: 'vscode-icons:file-type-log',
@@ -110,7 +157,11 @@
     env: 'vscode-icons:file-type-dotenv',
     npmrc: 'vscode-icons:file-type-npm',
     editorconfig: 'vscode-icons:file-type-editorconfig',
-    prettierrc: 'vscode-icons:file-type-prettier'
+    prettierrc: 'vscode-icons:file-type-prettier',
+    
+    // License & Readme
+    license: 'vscode-icons:file-type-license',
+    readme: 'vscode-icons:file-type-readme'
   };
 
   // Special folder name detection - Now with proper VSCode icons!
@@ -178,8 +229,8 @@
    * Get icon URL for a node (file or folder)
    */
   function getIconUrl(node) {
-    // Folders
-    if (node.children || node.type === 'directory') {
+    // Folders - check both type and children property
+    if (node.type === 'directory' || node.children !== undefined) {
       const isExpanded = expandedFolders.has(node.path);
       const folderName = node.name.toLowerCase();
       
@@ -295,6 +346,9 @@
     
     sprite.scale.set(scale, scale, 1);
     
+    // Store sprite reference on node for opacity updates during search
+    node.__sprite = sprite;
+    
     return sprite;
   }
 
@@ -357,22 +411,22 @@
           const size = node.size ? formatBytes(node.size) : 'N/A';
           const fileCount = node.children ? countFiles(node) : null;
           const isExpanded = node.children && expandedFolders.has(node.path);
-          const expandIcon = isExpanded ? '🔼' : '🔽';
+          const ext = !node.children && node.name.includes('.') ? node.name.split('.').pop().toUpperCase() : null;
           
           return `
             <div style="background: rgba(0,0,0,0.95); padding: 12px; border-radius: 8px; color: white; max-width: 350px; font-family: 'Segoe UI', sans-serif; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
               <strong style="font-size: 15px; color: #4a9eff;">${node.name}</strong><br/>
               <div style="margin-top: 8px; font-size: 12px; line-height: 1.6;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 16px;">${type === 'folder' ? '📁' : '📄'}</span>
                   <span style="color: #fbbf24; font-weight: 500;">${type.toUpperCase()}</span>
-                  ${node.children ? `<span style="color: #4ade80; margin-left: auto;">${expandIcon} ${isExpanded ? 'Expanded' : 'Click to expand'}</span>` : ''}
+                  ${ext ? `<span style="color: #a78bfa; background: rgba(167, 139, 250, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;">${ext}</span>` : ''}
+                  ${node.children ? `<span style="color: #4ade80; margin-left: auto;">${isExpanded ? 'Expanded' : 'Click to expand'}</span>` : ''}
                 </div>
                 <div style="margin-top: 6px;">
                   <span style="color: #999;">Size:</span> <span style="color: #4ade80; font-weight: 500;">${size}</span>
                 </div>
                 ${fileCount ? `<div><span style="color: #999;">Files:</span> <span style="color: #fbbf24; font-weight: 500;">${fileCount}</span></div>` : ''}
-                ${node.children ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); color: #60a5fa; font-size: 11px;">💡 Click to ${isExpanded ? 'collapse' : 'expand'}</div>` : ''}
+                ${node.children ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); color: #60a5fa; font-size: 11px;">Click to ${isExpanded ? 'collapse' : 'expand'}</div>` : ''}
                 <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); color: #9ca3af; font-size: 10px; font-family: 'Consolas', monospace;">${node.path}</div>
               </div>
             </div>
@@ -406,13 +460,33 @@
           return FILE_TYPE_COLORS[ext] || FILE_TYPE_COLORS.default;
         })
         
-        .nodeOpacity(0.95)
+        .nodeOpacity(node => {
+          // Fade non-matching nodes during search
+          const graphData = graph ? graph.graphData() : null;
+          const hasHighlights = graphData && graphData.nodes.some(n => n.highlighted);
+          
+          if (hasHighlights) {
+            return node.highlighted ? 1.0 : 0.15; // Dim non-matching nodes
+          }
+          return 0.95; // Normal opacity
+        })
         .nodeResolution(24)
         
         // Simple, clean connecting lines - NO particles, NO animations
-        .linkColor(() => 'rgba(255, 255, 255, 0.3)') // Clean white lines
-        .linkWidth(1) // Thin, minimal
-        .linkOpacity(0.3)
+        .linkColor(() => 'rgba(255, 255, 255, 0.2)') // Clean white lines, more subtle
+        .linkWidth(0.3) // Ultra thin, sleek lines
+        .linkOpacity(link => {
+          // Fade links during search if neither node is highlighted
+          const graphData = graph ? graph.graphData() : null;
+          const hasHighlights = graphData && graphData.nodes.some(n => n.highlighted);
+          
+          if (hasHighlights) {
+            const sourceHighlighted = link.source.highlighted;
+            const targetHighlighted = link.target.highlighted;
+            return (sourceHighlighted || targetHighlighted) ? 0.3 : 0.05;
+          }
+          return 0.3;
+        })
         .linkDirectionalParticles(0) // NO particles - clean and simple
         .linkDirectionalParticleSpeed(0)
         .linkDirectionalParticleWidth(0)
@@ -425,10 +499,14 @@
             return;
           }
           
-          // Check if it's a file (type === 'file' or has no children array with items)
-          const isFile = node.type === 'file' || !node.children || node.children.length === 0;
+          // Check if it's a folder (has type='directory' or has children property)
+          const isFolder = node.type === 'directory' || (node.children !== undefined);
           
-          if (isFile) {
+          if (isFolder) {
+            // It's a folder - toggle expand/collapse
+            console.log('Toggling folder:', node.path);
+            toggleFolderExpansion(node);
+          } else {
             // It's a file - try to open it
             if (!node.path) {
               console.error('Node has no path:', node);
@@ -437,9 +515,6 @@
             
             console.log('Opening file:', node.path);
             vscode.postMessage({ type: 'openFile', path: node.path });
-          } else {
-            // It's a folder - toggle expand/collapse
-            toggleFolderExpansion(node);
           }
         })
         .onNodeHover(node => {
@@ -728,7 +803,13 @@
     const graphData = graph.graphData();
     
     // Reset all highlights
-    graphData.nodes.forEach(node => node.highlighted = false);
+    graphData.nodes.forEach(node => {
+      node.highlighted = false;
+      // Reset sprite opacity
+      if (node.__sprite && node.__sprite.material) {
+        node.__sprite.material.opacity = 0.9;
+      }
+    });
 
     // Highlight matching nodes
     results.forEach(result => {
@@ -736,19 +817,41 @@
       if (node) {
         node.highlighted = true;
         console.log('Highlighted node:', node.name, node);
+        // Keep sprite fully visible
+        if (node.__sprite && node.__sprite.material) {
+          node.__sprite.material.opacity = 1.0;
+        }
+      }
+    });
+    
+    // Fade non-highlighted sprites
+    graphData.nodes.forEach(node => {
+      if (!node.highlighted && node.__sprite && node.__sprite.material) {
+        node.__sprite.material.opacity = 0.15;
       }
     });
 
-    // Force re-render by updating graph data
-    graph.nodeColor(graph.nodeColor());
+    // Force re-render to apply opacity changes
+    graph.nodeOpacity(graph.nodeOpacity());
+    graph.linkOpacity(graph.linkOpacity());
   }
 
   // Clear search
   function clearSearch() {
     if (!graph) return;
     const graphData = graph.graphData();
-    graphData.nodes.forEach(node => node.highlighted = false);
-    graph.nodeColor(graph.nodeColor());
+    graphData.nodes.forEach(node => {
+      node.highlighted = false;
+      // Restore sprite opacity
+      if (node.__sprite && node.__sprite.material) {
+        node.__sprite.material.opacity = 0.9;
+      }
+    });
+    
+    // Restore normal opacity
+    graph.nodeOpacity(graph.nodeOpacity());
+    graph.linkOpacity(graph.linkOpacity());
+    
     updateSearchInfo(0);
   }
 
