@@ -125,7 +125,7 @@ export class ProjectMapProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; worker-src 'none';">
   <link href="${styleUri}" rel="stylesheet">
   <title>Project Map</title>
 </head>
@@ -147,9 +147,28 @@ export class ProjectMapProvider {
   <div id="cy"></div>
   <div id="info"></div>
   
-  <script nonce="${nonce}" src="${threeUri}"></script>
-  <script nonce="${nonce}" src="${forceGraphUri}"></script>
-  <script nonce="${nonce}" src="${scriptUri}"></script>
+  <script nonce="${nonce}">
+    // Load libraries in order with nonce attributes
+    const nonce = '${nonce}';
+    const script1 = document.createElement('script');
+    script1.nonce = nonce;
+    script1.src = '${threeUri}';
+    script1.onload = () => {
+      console.log('Three.js loaded');
+      const script2 = document.createElement('script');
+      script2.nonce = nonce;
+      script2.src = '${forceGraphUri}';
+      script2.onload = () => {
+        console.log('ForceGraph3D loaded');
+        const script3 = document.createElement('script');
+        script3.nonce = nonce;
+        script3.src = '${scriptUri}';
+        document.body.appendChild(script3);
+      };
+      document.body.appendChild(script2);
+    };
+    document.body.appendChild(script1);
+  </script>
 </body>
 </html>`;
   }

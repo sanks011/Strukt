@@ -8,37 +8,51 @@
   function init3DGraph() {
     const container = document.getElementById('cy');
     
-    // @ts-ignore - ForceGraph3D is loaded globally
-    graph = ForceGraph3D()(container)
-      .backgroundColor('#1e1e1e')
-      .nodeLabel('label')
-      .nodeColor(node => node.type === 'folder' ? '#0e639c' : '#3794ff')
-      .nodeVal(node => node.type === 'folder' ? 8 : 4)
-      .nodeOpacity(0.9)
-      .linkColor(() => '#ffffff44')
-      .linkWidth(1)
-      .linkOpacity(0.6)
-      .linkDirectionalParticles(2)
-      .linkDirectionalParticleWidth(2)
-      .linkDirectionalParticleSpeed(0.006)
-      .d3AlphaDecay(0.01)
-      .d3VelocityDecay(0.3)
-      .warmupTicks(100)
-      .cooldownTicks(200)
-      .enableNodeDrag(true)
-      .enableNavigationControls(true)
-      .showNavInfo(false)
-      .onNodeClick(handleNodeClick)
-      .onNodeHover(handleNodeHover);
+    // Check if ForceGraph3D is loaded
+    if (typeof ForceGraph3D === 'undefined') {
+      console.error('ForceGraph3D is not loaded!');
+      container.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">Error: 3D Force Graph library not loaded. Please reload the extension.</div>';
+      return;
+    }
+    
+    try {
+      // @ts-ignore - ForceGraph3D is loaded globally
+      graph = ForceGraph3D()(container)
+        .backgroundColor('#1e1e1e')
+        .nodeLabel('label')
+        .nodeColor(node => node.type === 'folder' ? '#0e639c' : '#3794ff')
+        .nodeVal(node => node.type === 'folder' ? 8 : 4)
+        .nodeOpacity(0.9)
+        .linkColor(() => '#ffffff44')
+        .linkWidth(1)
+        .linkOpacity(0.6)
+        .linkDirectionalParticles(2)
+        .linkDirectionalParticleWidth(2)
+        .linkDirectionalParticleSpeed(0.006)
+        .d3AlphaDecay(0.01)
+        .d3VelocityDecay(0.3)
+        .warmupTicks(100)
+        .cooldownTicks(200)
+        .enableNodeDrag(true)
+        .enableNavigationControls(true)
+        .showNavInfo(false)
+        .onNodeClick(handleNodeClick)
+        .onNodeHover(handleNodeHover);
 
-    // Smooth camera controls
-    const controls = graph.controls();
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
-    controls.zoomSpeed = 0.5;
-    controls.minDistance = 50;
-    controls.maxDistance = 2000;
+      // Smooth camera controls
+      const controls = graph.controls();
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.rotateSpeed = 0.5;
+      controls.zoomSpeed = 2.5;
+      controls.minDistance = 50;
+      controls.maxDistance = 2000;
+      
+      console.log('3D Force Graph initialized successfully');
+    } catch (error) {
+      console.error('Error initializing 3D Force Graph:', error);
+      container.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">Error initializing graph: ' + error.message + '</div>';
+    }
   }
 
   // Handle node clicks
