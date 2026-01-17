@@ -47,7 +47,8 @@ export class ProjectMapProvider {
         localResourceRoots: [
           vscode.Uri.joinPath(this.extensionUri, 'media'),
           vscode.Uri.joinPath(this.extensionUri, 'node_modules', '3d-force-graph', 'dist'),
-          vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'three', 'build')
+          vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'three', 'build'),
+          vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'particles.js')
         ]
       }
     );
@@ -117,6 +118,9 @@ export class ProjectMapProvider {
     const forceGraphUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, 'node_modules', '3d-force-graph', 'dist', '3d-force-graph.min.js')
     );
+    const particlesUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'particles.js', 'particles.js')
+    );
 
     const nonce = this.getNonce();
 
@@ -127,42 +131,85 @@ export class ProjectMapProvider {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; worker-src 'none';">
   <link href="${styleUri}" rel="stylesheet">
-  <title>Project Map</title>
+  <title>Project Map - Strukt</title>
 </head>
 <body>
+  <div id="particles-bg"></div>
+  
   <div id="controls">
-    <button id="fit">Fit to Screen</button>
-    <button id="reset">Reset View</button>
-    <select id="layout">
-      <option value="force-directed">Force Directed</option>
-      <option value="hierarchical">Hierarchical</option>
-      <option value="radial">Radial</option>
-    </select>
-    <div id="zoom-container">
-      <label for="zoom-slider">Zoom:</label>
-      <input type="range" id="zoom-slider" min="5" max="300" value="100" step="5">
-      <span id="zoom-level">100%</span>
+    <div class="control-group">
+      <button id="fit" title="Fit to Screen">🔍 Fit</button>
+      <button id="reset" title="Reset View">🎯 Reset</button>
+    </div>
+    
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="🔍 Search files..." />
+      <button id="search-clear" title="Clear search">✕</button>
+    </div>
+    
+    <div id="search-info" style="display: none;"></div>
+  </div>
+  
+  <div id="breadcrumb"></div>
+  
+  <div id="stats-panel">
+    <div class="stats-header">
+      <h3>📊 Project Stats</h3>
+      <button id="toggle-stats" title="Toggle stats">−</button>
+    </div>
+    <div class="stats-content">
+      <div class="stat-item">
+        <span class="stat-label">Files:</span>
+        <span class="stat-value" id="total-files">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Folders:</span>
+        <span class="stat-value" id="total-folders">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Total Size:</span>
+        <span class="stat-value" id="total-size">0 B</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Max Depth:</span>
+        <span class="stat-value" id="deepest-level">0</span>
+      </div>
+      <div class="stat-section">
+        <h4>File Types</h4>
+        <ul id="file-types"></ul>
+      </div>
+      <div class="stat-section">
+        <h4>Largest Files</h4>
+        <ul id="largest-files"></ul>
+      </div>
     </div>
   </div>
+  
   <div id="cy"></div>
-  <div id="info"></div>
   
   <script nonce="${nonce}">
     // Load libraries in order with nonce attributes
     const nonce = '${nonce}';
     const script1 = document.createElement('script');
     script1.nonce = nonce;
-    script1.src = '${threeUri}';
+    script1.src = '${particlesUri}';
     script1.onload = () => {
-      console.log('Three.js loaded');
+      console.log('particles.js loaded');
       const script2 = document.createElement('script');
       script2.nonce = nonce;
-      script2.src = '${forceGraphUri}';
+      script2.src = '${threeUri}';
       script2.onload = () => {
-        console.log('ForceGraph3D loaded');
+        console.log('Three.js loaded');
         const script3 = document.createElement('script');
         script3.nonce = nonce;
-        script3.src = '${scriptUri}';
+        script3.src = '${forceGraphUri}';
+        script3.onload = () => {
+          console.log('ForceGraph3D loaded');
+          const script4 = document.createElement('script');
+          script4.nonce = nonce;
+          script4.src = '${scriptUri}';
+          document.body.appendChild(script4);
+        };
         document.body.appendChild(script3);
       };
       document.body.appendChild(script2);

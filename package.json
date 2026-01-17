@@ -92,6 +92,7 @@
   },
   "dependencies": {
     "3d-force-graph": "^1.73.3",
+    "particles.js": "^2.0.0",
     "three": "^0.160.0"
   }
 }
