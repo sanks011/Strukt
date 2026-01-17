@@ -46,7 +46,8 @@ export class ProjectMapProvider {
         retainContextWhenHidden: false,
         localResourceRoots: [
           vscode.Uri.joinPath(this.extensionUri, 'media'),
-          vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'cytoscape', 'dist')
+          vscode.Uri.joinPath(this.extensionUri, 'node_modules', '3d-force-graph', 'dist'),
+          vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'three', 'build')
         ]
       }
     );
@@ -110,8 +111,11 @@ export class ProjectMapProvider {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, 'media', 'style.css')
     );
-    const cytoscapeUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'cytoscape', 'dist', 'cytoscape.min.js')
+    const threeUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'three', 'build', 'three.min.js')
+    );
+    const forceGraphUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, 'node_modules', '3d-force-graph', 'dist', '3d-force-graph.min.js')
     );
 
     const nonce = this.getNonce();
@@ -128,24 +132,23 @@ export class ProjectMapProvider {
 <body>
   <div id="controls">
     <button id="fit">Fit to Screen</button>
-    <button id="reset">Reset Zoom</button>
-    <button id="refresh">Refresh</button>
+    <button id="reset">Reset View</button>
     <select id="layout">
-      <option value="breadthfirst">Breadth First</option>
-      <option value="cose">COSE</option>
-      <option value="circle">Circle</option>
-      <option value="grid">Grid</option>
+      <option value="force-directed">Force Directed</option>
+      <option value="hierarchical">Hierarchical</option>
+      <option value="radial">Radial</option>
     </select>
     <div id="zoom-container">
       <label for="zoom-slider">Zoom:</label>
-      <input type="range" id="zoom-slider" min="5" max="500" value="100" step="5">
+      <input type="range" id="zoom-slider" min="5" max="300" value="100" step="5">
       <span id="zoom-level">100%</span>
     </div>
   </div>
   <div id="cy"></div>
   <div id="info"></div>
   
-  <script nonce="${nonce}" src="${cytoscapeUri}"></script>
+  <script nonce="${nonce}" src="${threeUri}"></script>
+  <script nonce="${nonce}" src="${forceGraphUri}"></script>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;

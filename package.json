@@ -62,13 +62,12 @@
         "strukt.layout": {
           "type": "string",
           "enum": [
-            "breadthfirst",
-            "cose",
-            "dagre",
-            "circle"
+            "force-directed",
+            "hierarchical",
+            "radial"
           ],
-          "default": "breadthfirst",
-          "description": "Layout algorithm for graph visualization"
+          "default": "force-directed",
+          "description": "Layout algorithm for 3D graph visualization"
         }
       }
     }
@@ -92,6 +91,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "cytoscape": "^3.33.1"
+    "3d-force-graph": "^1.73.3",
+    "three": "^0.160.0"
   }
 }

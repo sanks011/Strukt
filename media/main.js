@@ -1,123 +1,75 @@
 // @ts-check
 (function () {
-  // @ts-ignore
   const vscode = acquireVsCodeApi();
-  let cy;
+  let graph;
+  let currentZoom = 100;
 
-  // Initialize Cytoscape
-  function initCytoscape() {
-    // @ts-ignore - cytoscape is loaded globally
-    cy = cytoscape({
-      container: document.getElementById('cy'),
-      
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'label': 'data(label)',
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'background-color': 'var(--vscode-editor-background)',
-            'border-color': 'var(--vscode-editor-foreground)',
-            'border-width': 2,
-            'color': 'var(--vscode-editor-foreground)',
-            'font-size': '14px',
-            'font-family': 'var(--vscode-font-family)',
-            'width': 'label',
-            'height': 'label',
-            'padding': '15px',
-            'text-wrap': 'wrap',
-            'text-max-width': '150px',
-            'shape': 'roundrectangle'
-          }
-        },
-        {
-          selector: 'node[type="folder"]',
-          style: {
-            'background-color': 'var(--vscode-button-background)',
-            'color': 'var(--vscode-button-foreground)',
-            'font-weight': 'bold',
-            'padding': '20px',
-            'font-size': '16px'
-          }
-        },
-        {
-          selector: 'node[type="file"]',
-          style: {
-            'background-color': 'var(--vscode-editor-background)',
-            'border-color': 'var(--vscode-textLink-foreground)',
-            'padding': '12px',
-            'font-size': '13px'
-          }
-        },
-        {
-          selector: 'edge',
-          style: {
-            'width': 2,
-            'line-color': 'var(--vscode-editor-foreground)',
-            'target-arrow-color': 'var(--vscode-editor-foreground)',
-            'target-arrow-shape': 'triangle',
-            'curve-style': 'bezier',
-            'opacity': 0.6
-          }
-        },
-        {
-          selector: 'node:selected',
-          style: {
-            'background-color': 'var(--vscode-button-hoverBackground)',
-            'border-color': 'var(--vscode-focusBorder)',
-            'border-width': 3
-          }
-        }
-      ],
+  // Initialize 3D Force Graph
+  function init3DGraph() {
+    const container = document.getElementById('cy');
+    
+    // @ts-ignore - ForceGraph3D is loaded globally
+    graph = ForceGraph3D()(container)
+      .backgroundColor('#1e1e1e')
+      .nodeLabel('label')
+      .nodeColor(node => node.type === 'folder' ? '#0e639c' : '#3794ff')
+      .nodeVal(node => node.type === 'folder' ? 8 : 4)
+      .nodeOpacity(0.9)
+      .linkColor(() => '#ffffff44')
+      .linkWidth(1)
+      .linkOpacity(0.6)
+      .linkDirectionalParticles(2)
+      .linkDirectionalParticleWidth(2)
+      .linkDirectionalParticleSpeed(0.006)
+      .d3AlphaDecay(0.01)
+      .d3VelocityDecay(0.3)
+      .warmupTicks(100)
+      .cooldownTicks(200)
+      .enableNodeDrag(true)
+      .enableNavigationControls(true)
+      .showNavInfo(false)
+      .onNodeClick(handleNodeClick)
+      .onNodeHover(handleNodeHover);
 
-      layout: {
-        name: 'breadthfirst',
-        directed: true,
-        spacingFactor: 2.5,
-        animate: false,
-        padding: 50
-      },
+    // Smooth camera controls
+    const controls = graph.controls();
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.rotateSpeed = 0.5;
+    controls.zoomSpeed = 0.5;
+    controls.minDistance = 50;
+    controls.maxDistance = 2000;
+  }
 
-      wheelSensitivity: 0.05,
-      minZoom: 0.05,
-      maxZoom: 5,
-      zoomingEnabled: true,
-      userZoomingEnabled: true
-    });
+  // Handle node clicks
+  function handleNodeClick(node) {
+    if (node && node.type === 'file') {
+      vscode.postMessage({
+        type: 'openFile',
+        path: node.path
+      });
+    }
+    showNodeInfo(node);
+  }
 
-    // Handle node clicks
-    cy.on('tap', 'node', function (evt) {
-      const node = evt.target;
-      const nodeData = node.data();
-      
-      if (nodeData.type === 'file') {
-        vscode.postMessage({
-          type: 'openFile',
-          path: nodeData.path
-        });
-      }
-
-      showNodeInfo(nodeData);
-    });
-
-    // Handle hover
-    cy.on('mouseover', 'node', function (evt) {
-      const node = evt.target;
-      node.style('cursor', 'pointer');
-      showNodeInfo(node.data());
-    });
-
-    cy.on('mouseout', 'node', function () {
+  // Handle node hover
+  function handleNodeHover(node) {
+    if (node) {
+      showNodeInfo(node);
+      document.body.style.cursor = 'pointer';
+    } else {
       const infoElement = document.getElementById('info');
       if (infoElement) {
         infoElement.innerHTML = '';
       }
-    });
+      document.body.style.cursor = 'default';
+    }
   }
 
   // Show node information
   function showNodeInfo(data) {
+    if (!data) return;
+    
     const info = document.getElementById('info');
     if (!info) return;
     
@@ -144,35 +96,27 @@
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
 
-  // Update graph with new data
-  function updateGraph(tree, layout = 'breadthfirst') {
-    if (!cy) {
-      return;
-    }
+  // Convert tree to graph data
+  function treeToGraph(tree) {
+    const nodes = [];
+    const links = [];
 
-    const elements = [];
-    
     function processNode(node, parentId = null) {
       const nodeId = node.path || node.name;
       
-      elements.push({
-        data: {
-          id: nodeId,
-          label: node.name,
-          type: node.type,
-          path: node.path,
-          size: node.size,
-          children: node.children?.length || 0
-        }
+      nodes.push({
+        id: nodeId,
+        label: node.name,
+        type: node.type,
+        path: node.path,
+        size: node.size,
+        children: node.children?.length || 0
       });
 
       if (parentId) {
-        elements.push({
-          data: {
-            id: `${parentId}-${nodeId}`,
-            source: parentId,
-            target: nodeId
-          }
+        links.push({
+          source: parentId,
+          target: nodeId
         });
       }
 
@@ -182,54 +126,70 @@
     }
 
     processNode(tree);
+    return { nodes, links };
+  }
 
-    cy.elements().remove();
-    cy.add(elements);
+  // Apply layout
+  function applyLayout(layout) {
+    if (!graph) return;
+
+    switch (layout) {
+      case 'hierarchical':
+        graph
+          .dagMode('td')
+          .dagLevelDistance(150);
+        break;
+      
+      case 'radial':
+        graph
+          .dagMode('radialout')
+          .dagLevelDistance(100);
+        break;
+      
+      case 'force-directed':
+      default:
+        graph
+          .dagMode(null)
+          .d3Force('charge').strength(-200)
+          .d3Force('link').distance(80);
+        break;
+    }
+  }
+
+  // Update graph with new data
+  function updateGraph(tree, layout = 'force-directed') {
+    if (!graph) return;
+
+    const graphData = treeToGraph(tree);
     
-    const layoutOptions = {
-      breadthfirst: {
-        name: 'breadthfirst',
-        directed: true,
-        spacingFactor: 2.5,
-        animate: true,
-        animationDuration: 300,
-        padding: 50,
-        avoidOverlap: true,
-        nodeDimensionsIncludeLabels: true
-      },
-      cose: {
-        name: 'cose',
-        animate: true,
-        animationDuration: 300,
-        nodeOverlap: 100,
-        idealEdgeLength: 150,
-        nodeRepulsion: 8000,
-        padding: 50,
-        randomize: false
-      },
-      circle: {
-        name: 'circle',
-        animate: true,
-        animationDuration: 300,
-        padding: 50,
-        avoidOverlap: true,
-        spacingFactor: 2
-      },
-      grid: {
-        name: 'grid',
-        animate: true,
-        animationDuration: 300,
-        padding: 50,
-        avoidOverlap: true,
-        spacingFactor: 2,
-        rows: undefined,
-        cols: undefined
+    // Apply layout first
+    applyLayout(layout);
+    
+    // Update graph data
+    graph.graphData(graphData);
+    
+    // Zoom to fit after a delay
+    setTimeout(() => {
+      graph.zoomToFit(1000, 50);
+      updateZoomDisplay();
+    }, 500);
+  }
+
+  // Update zoom display
+  function updateZoomDisplay() {
+    const zoomLevel = document.getElementById('zoom-level');
+    if (zoomLevel && graph) {
+      const camera = graph.camera();
+      const distance = camera.position.length();
+      const zoom = Math.round((1000 / distance) * 100);
+      currentZoom = Math.max(5, Math.min(300, zoom));
+      zoomLevel.textContent = currentZoom + '%';
+      
+      const zoomSlider = document.getElementById('zoom-slider');
+      if (zoomSlider instanceof HTMLInputElement) {
+        zoomSlider.value = currentZoom.toString();
       }
-    };
-
-    cy.layout(layoutOptions[layout] || layoutOptions.breadthfirst).run();
-
-    cy.fit(50);
+    }
   }
 
   // Handle messages from extension
@@ -245,104 +205,103 @@
 
   // Controls
   document.getElementById('fit')?.addEventListener('click', () => {
-    cy?.fit(50);
-    updateZoomDisplay();
+    if (graph) {
+      graph.zoomToFit(1000, 50);
+      setTimeout(updateZoomDisplay, 1100);
+    }
   });
 
   document.getElementById('reset')?.addEventListener('click', () => {
-    cy?.reset();
-    updateZoomDisplay();
-  });
-
-  document.getElementById('refresh')?.addEventListener('click', () => {
-    vscode.postMessage({ type: 'refresh' });
+    if (graph) {
+      const camera = graph.camera();
+      const controls = graph.controls();
+      
+      // Smooth transition to default position
+      const startPos = camera.position.clone();
+      const endPos = { x: 0, y: 0, z: 1000 };
+      const duration = 800;
+      const startTime = Date.now();
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease out cubic
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.x = startPos.x + (endPos.x - startPos.x) * easeProgress;
+        camera.position.y = startPos.y + (endPos.y - startPos.y) * easeProgress;
+        camera.position.z = startPos.z + (endPos.z - startPos.z) * easeProgress;
+        
+        controls.target.set(0, 0, 0);
+        controls.update();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          updateZoomDisplay();
+        }
+      }
+      
+      animate();
+    }
   });
 
   // Zoom slider control
   const zoomSlider = document.getElementById('zoom-slider');
-  const zoomLevel = document.getElementById('zoom-level');
-
-  function updateZoomDisplay() {
-    if (cy && zoomLevel) {
-      const zoom = Math.round(cy.zoom() * 100);
-      zoomLevel.textContent = zoom + '%';
-      if (zoomSlider instanceof HTMLInputElement) {
-        zoomSlider.value = zoom.toString();
-      }
-    }
-  }
 
   zoomSlider?.addEventListener('input', (e) => {
-    if (e.target instanceof HTMLInputElement && cy) {
-      const zoomValue = parseInt(e.target.value) / 100;
-      cy.zoom({
-        level: zoomValue,
-        renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
-      });
-      updateZoomDisplay();
+    if (e.target instanceof HTMLInputElement && graph) {
+      const zoomValue = parseInt(e.target.value);
+      const camera = graph.camera();
+      const controls = graph.controls();
+      
+      // Calculate distance from zoom percentage
+      const distance = 1000 / (zoomValue / 100);
+      
+      // Get current direction
+      const direction = camera.position.clone().normalize();
+      
+      // Set new position maintaining direction
+      camera.position.copy(direction.multiplyScalar(distance));
+      controls.update();
+      
+      currentZoom = zoomValue;
+      const zoomLevel = document.getElementById('zoom-level');
+      if (zoomLevel) {
+        zoomLevel.textContent = zoomValue + '%';
+      }
     }
   });
 
-  // Update zoom display when user zooms with mouse wheel
-  cy?.on('zoom', () => {
-    updateZoomDisplay();
-  });
-
+  // Layout change
   document.getElementById('layout')?.addEventListener('change', (e) => {
-    if (e.target instanceof HTMLSelectElement) {
-      const layout = e.target.value;
-      if (cy) {
-        const layoutOptions = {
-          breadthfirst: {
-            name: 'breadthfirst',
-            directed: true,
-            spacingFactor: 2.5,
-            animate: true,
-            animationDuration: 300,
-            padding: 50,
-            avoidOverlap: true,
-            nodeDimensionsIncludeLabels: true
-          },
-          cose: {
-            name: 'cose',
-            animate: true,
-            animationDuration: 300,
-            nodeOverlap: 100,
-            idealEdgeLength: 150,
-            nodeRepulsion: 8000,
-            padding: 50,
-            randomize: false
-          },
-          circle: {
-            name: 'circle',
-            animate: true,
-            animationDuration: 300,
-            padding: 50,
-            avoidOverlap: true,
-            spacingFactor: 2
-          },
-          grid: {
-            name: 'grid',
-            animate: true,
-            animationDuration: 300,
-            padding: 50,
-            avoidOverlap: true,
-            spacingFactor: 2
-          }
-        };
-        
-        cy.layout(layoutOptions[layout] || layoutOptions.breadthfirst).run();
-      }
+    if (e.target instanceof HTMLSelectElement && graph) {
+      applyLayout(e.target.value);
+      
+      // Re-heat simulation for layout change
+      graph.numDimensions(3);
+      
+      setTimeout(() => {
+        graph.zoomToFit(1000, 50);
+      }, 500);
     }
   });
 
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCytoscape);
+    document.addEventListener('DOMContentLoaded', init3DGraph);
   } else {
-    initCytoscape();
+    init3DGraph();
   }
 
   // Notify extension that webview is ready
   vscode.postMessage({ type: 'ready' });
+
+  // Update zoom display periodically during user interaction
+  setInterval(() => {
+    if (graph && document.hasFocus()) {
+      updateZoomDisplay();
+    }
+  }, 500);
 })();
