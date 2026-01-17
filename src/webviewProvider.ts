@@ -136,7 +136,7 @@ export class ProjectMapProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' https://unpkg.com; worker-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' https://unpkg.com; img-src https://cdn.jsdelivr.net data:; worker-src 'none';">
   <link href="${styleUri}" rel="stylesheet">
   <script nonce="${nonce}" src="https://unpkg.com/feather-icons"></script>
   <title>Project Map - Strukt</title>
@@ -157,17 +157,6 @@ export class ProjectMapProvider {
     </div>
     
     <div id="search-info" style="display: none;"></div>
-    
-    <div class="legend">
-      <div class="legend-item">
-        <span class="legend-icon" style="background: #4a9eff;"></span>
-        <span class="legend-text">Folders</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-icon" style="background: #888;"></span>
-        <span class="legend-text">Files (size = node size)</span>
-      </div>
-    </div>
   </div>
   
   <div id="breadcrumb"></div>

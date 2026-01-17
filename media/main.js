@@ -19,6 +19,286 @@
 
   const FOLDER_COLOR = '#4a9eff';
 
+  // ========================================
+  // ICON MAPPING SYSTEM - Making it USEFUL!
+  // ========================================
+
+  // Texture cache to avoid reloading same icons
+  const textureCache = new Map();
+
+  // Devicon CDN base URL
+  const DEVICON_BASE = 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons';
+
+  // File extension to Devicon icon mapping
+  const FILE_ICON_MAP = {
+    // JavaScript ecosystem
+    js: 'javascript/javascript-original.svg',
+    jsx: 'react/react-original.svg',
+    ts: 'typescript/typescript-original.svg',
+    tsx: 'react/react-original.svg',
+    json: 'json/json-original.svg',
+    
+    // Web
+    html: 'html5/html5-original.svg',
+    htm: 'html5/html5-original.svg',
+    css: 'css3/css3-original.svg',
+    scss: 'sass/sass-original.svg',
+    sass: 'sass/sass-original.svg',
+    less: 'less/less-plain-wordmark.svg',
+    
+    // Python
+    py: 'python/python-original.svg',
+    pyw: 'python/python-original.svg',
+    ipynb: 'jupyter/jupyter-original.svg',
+    
+    // C family
+    c: 'c/c-original.svg',
+    cpp: 'cplusplus/cplusplus-original.svg',
+    cc: 'cplusplus/cplusplus-original.svg',
+    cxx: 'cplusplus/cplusplus-original.svg',
+    h: 'c/c-original.svg',
+    hpp: 'cplusplus/cplusplus-original.svg',
+    cs: 'csharp/csharp-original.svg',
+    
+    // Other languages
+    java: 'java/java-original.svg',
+    go: 'go/go-original-wordmark.svg',
+    rs: 'rust/rust-original.svg',
+    rb: 'ruby/ruby-original.svg',
+    php: 'php/php-original.svg',
+    swift: 'swift/swift-original.svg',
+    kt: 'kotlin/kotlin-original.svg',
+    scala: 'scala/scala-original.svg',
+    
+    // Markup & Data
+    md: 'markdown/markdown-original.svg',
+    xml: 'xml/xml-original.svg',
+    yaml: 'yaml/yaml-original.svg',
+    yml: 'yaml/yaml-original.svg',
+    toml: 'toml/toml-original.svg',
+    
+    // Shell
+    sh: 'bash/bash-original.svg',
+    bash: 'bash/bash-original.svg',
+    zsh: 'bash/bash-original.svg',
+    ps1: 'powershell/powershell-original.svg',
+    
+    // Build & Config
+    dockerfile: 'docker/docker-original.svg',
+    makefile: 'cmake/cmake-original.svg',
+    gradle: 'gradle/gradle-original.svg',
+    
+    // Databases
+    sql: 'mysql/mysql-original.svg',
+    
+    // Frameworks
+    vue: 'vuejs/vuejs-original.svg',
+    svelte: 'svelte/svelte-original.svg',
+    
+    // Other
+    dart: 'dart/dart-original.svg',
+    lua: 'lua/lua-original.svg',
+    r: 'r/r-original.svg',
+    
+    // Special files
+    txt: 'default', // Will use DEFAULT_FILE_ICON
+    log: 'default',
+    gitignore: 'git/git-original.svg',
+    env: 'nodejs/nodejs-original.svg',
+    npmrc: 'npm/npm-original-wordmark.svg',
+    editorconfig: 'vscode/vscode-original.svg',
+    prettierrc: 'prettier/prettier-original.svg'
+  };
+
+  // Special folder name detection
+  const FOLDER_ICON_MAP = {
+    // Frontend/UI folders
+    'components': 'react/react-original.svg',
+    'component': 'react/react-original.svg',
+    'views': 'vuejs/vuejs-original.svg',
+    'pages': 'nextjs/nextjs-original.svg',
+    'layouts': 'html5/html5-original.svg',
+    
+    // Backend folders
+    'server': 'nodejs/nodejs-original.svg',
+    'api': 'nodejs/nodejs-original.svg',
+    'backend': 'nodejs/nodejs-original.svg',
+    'services': 'nodejs/nodejs-original.svg',
+    
+    // Frontend client
+    'client': 'react/react-original.svg',
+    'frontend': 'react/react-original.svg',
+    'app': 'react/react-original.svg',
+    
+    // Common folders
+    'src': 'javascript/javascript-original.svg',
+    'lib': 'npm/npm-original-wordmark.svg',
+    'utils': 'javascript/javascript-original.svg',
+    'helpers': 'javascript/javascript-original.svg',
+    'config': 'yaml/yaml-original.svg',
+    'configs': 'yaml/yaml-original.svg',
+    
+    // Build/Deploy
+    'dist': 'webpack/webpack-original.svg',
+    'build': 'webpack/webpack-original.svg',
+    'public': 'html5/html5-original.svg',
+    '.github': 'github/github-original.svg',
+    '.vscode': 'vscode/vscode-original.svg',
+    
+    // Testing
+    'tests': 'jest/jest-plain.svg',
+    'test': 'jest/jest-plain.svg',
+    '__tests__': 'jest/jest-plain.svg',
+    'spec': 'jest/jest-plain.svg',
+    
+    // Assets
+    'assets': 'figma/figma-original.svg',
+    'images': 'figma/figma-original.svg',
+    'img': 'figma/figma-original.svg',
+    'icons': 'figma/figma-original.svg',
+    'static': 'html5/html5-original.svg',
+    
+    // Styles
+    'styles': 'css3/css3-original.svg',
+    'css': 'css3/css3-original.svg',
+    'scss': 'sass/sass-original.svg',
+    
+    // Documentation
+    'docs': 'markdown/markdown-original.svg',
+    'doc': 'markdown/markdown-original.svg',
+    'documentation': 'markdown/markdown-original.svg',
+    
+    // Database
+    'models': 'mysql/mysql-original.svg',
+    'database': 'mysql/mysql-original.svg',
+    'migrations': 'mysql/mysql-original.svg',
+    
+    // Node modules
+    'node_modules': 'npm/npm-original-wordmark.svg',
+    'packages': 'npm/npm-original-wordmark.svg',
+    'vendor': 'composer/composer-original.svg'
+  };
+
+  // Default fallback icons (using data URIs for guaranteed availability)
+  const DEFAULT_FOLDER_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YTllZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjIgMTlhMiAyIDAgMCAxLTIgMkg0YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDVsMiAzaDlhMiAyIDAgMCAxIDIgMnoiPjwvcGF0aD48L3N2Zz4=';
+  const DEFAULT_FILE_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTMgMkg2YTIgMiAwIDAgMC0yIDJ2MTZhMiAyIDAgMCAwIDIgMmgxMmEyIDIgMCAwIDAgMi0yVjlsLTctN3oiPjwvcGF0aD48cG9seWxpbmUgcG9pbnRzPSIxMyAyIDEzIDkgMjAgOSI+PC9wb2x5bGluZT48L3N2Zz4=';
+
+  /**
+   * Get icon URL for a node (file or folder)
+   */
+  function getIconUrl(node) {
+    // Folders
+    if (node.children || node.type === 'directory') {
+      const folderName = node.name.toLowerCase();
+      if (FOLDER_ICON_MAP[folderName]) {
+        return `${DEVICON_BASE}/${FOLDER_ICON_MAP[folderName]}`;
+      }
+      return DEFAULT_FOLDER_ICON;
+    }
+    
+    // Files - check special filenames first
+    const fileName = node.name.toLowerCase();
+    
+    // Special filename patterns
+    if (fileName === '.gitignore' || fileName === '.gitattributes') {
+      return `${DEVICON_BASE}/git/git-original.svg`;
+    }
+    if (fileName === '.env' || fileName === '.env.local' || fileName === '.env.example') {
+      return `${DEVICON_BASE}/nodejs/nodejs-original.svg`;
+    }
+    if (fileName === '.npmrc' || fileName === 'package.json' || fileName === 'package-lock.json') {
+      return `${DEVICON_BASE}/npm/npm-original-wordmark.svg`;
+    }
+    if (fileName === '.editorconfig') {
+      return `${DEVICON_BASE}/vscode/vscode-original.svg`;
+    }
+    if (fileName === '.prettierrc' || fileName === 'prettier.config.js') {
+      return `${DEVICON_BASE}/prettier/prettier-original.svg`;
+    }
+    if (fileName === 'dockerfile' || fileName.startsWith('dockerfile.')) {
+      return `${DEVICON_BASE}/docker/docker-original.svg`;
+    }
+    if (fileName === 'makefile') {
+      return `${DEVICON_BASE}/cmake/cmake-original.svg`;
+    }
+    if (fileName === 'readme.md' || fileName === 'readme') {
+      return `${DEVICON_BASE}/markdown/markdown-original.svg`;
+    }
+    
+    // Check extension
+    const ext = getFileExtension(node.name);
+    const mapping = FILE_ICON_MAP[ext];
+    
+    if (mapping && mapping !== 'default') {
+      return `${DEVICON_BASE}/${mapping}`;
+    }
+    
+    return DEFAULT_FILE_ICON;
+  }
+
+  /**
+   * Create a 3D sprite icon for a node
+   * Based on: https://github.com/vasturiano/3d-force-graph/issues/408
+   */
+  function createNodeSprite(node) {
+    const iconUrl = getIconUrl(node);
+    
+    // Check cache first
+    let texture = textureCache.get(iconUrl);
+    
+    if (!texture) {
+      // Load texture
+      texture = new THREE.TextureLoader().load(
+        iconUrl,
+        // Success callback
+        (loadedTexture) => {
+          console.log('✅ Loaded icon:', iconUrl);
+        },
+        // Progress callback
+        undefined,
+        // Error callback
+        (error) => {
+          console.warn('⚠️ Failed to load icon:', iconUrl, error);
+          // Try fallback
+          const fallbackUrl = node.children ? DEFAULT_FOLDER_ICON : DEFAULT_FILE_ICON;
+          if (iconUrl !== fallbackUrl) {
+            texture = new THREE.TextureLoader().load(fallbackUrl);
+            textureCache.set(iconUrl, texture);
+          }
+        }
+      );
+      
+      textureCache.set(iconUrl, texture);
+    }
+    
+    // Create sprite material
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false // Prevent z-fighting
+    });
+    
+    // Create sprite
+    const sprite = new THREE.Sprite(material);
+    
+    // Size based on node type and size
+    let scale;
+    if (node.children) {
+      // Folders - larger and more prominent
+      const totalSize = calculateTotalSize(node);
+      scale = Math.max(20, Math.min(45, totalSize / 6000));
+    } else {
+      // Files - smaller, sized by file size
+      const size = node.size || 1000;
+      scale = Math.max(8, Math.min(25, size / 2000));
+    }
+    
+    sprite.scale.set(scale, scale, 1);
+    
+    return sprite;
+  }
+
   // Initialize particles.js background
   function initParticles() {
     if (typeof particlesJS === 'undefined') return;
@@ -102,7 +382,11 @@
           }
         })
         
-        // Color by file type - instant recognition
+        // ⭐ SPRITE ICONS - Making it ACTUALLY useful for developers!
+        // Replace boring colored balls with recognizable file/folder icons
+        .nodeThreeObject(node => createNodeSprite(node))
+        
+        // Color by file type - instant recognition (kept for backwards compat but sprites override)
         .nodeColor(node => {
           if (node.highlighted) return '#ff00ff'; // Search results
           if (node.modified) return '#ff6b6b'; // Git modified
