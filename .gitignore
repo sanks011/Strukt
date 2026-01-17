@@ -1,0 +1,7 @@
+.vscode-test/
+dist/
+out/
+node_modules/
+*.vsix
+.DS_Store
+.github
