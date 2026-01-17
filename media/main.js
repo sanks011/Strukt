@@ -5,6 +5,9 @@
   const vscode = acquireVsCodeApi();
   let graph;
   let currentTree = null;
+  let expandedFolders = new Set(); // Track which folders are expanded
+  let allNodes = []; // Store all nodes for filtering
+  let allLinks = []; // Store all links for filtering
 
   // File type color mapping - INSTANT VISUAL RECOGNITION
   const FILE_TYPE_COLORS = {
@@ -180,7 +183,8 @@
   };
 
   // Default fallback icons (using data URIs for guaranteed availability)
-  const DEFAULT_FOLDER_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YTllZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjIgMTlhMiAyIDAgMCAxLTIgMkg0YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDVsMiAzaDlhMiAyIDAgMCAxIDIgMnoiPjwvcGF0aD48L3N2Zz4=';
+  const DEFAULT_FOLDER_CLOSED = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YTllZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjIgMTlhMiAyIDAgMCAxLTIgMkg0YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDVsMiAzaDlhMiAyIDAgMCAxIDIgMnoiPjwvcGF0aD48L3N2Zz4=';
+  const DEFAULT_FOLDER_OPEN = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmQ3MDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjIgMTlhMiAyIDAgMCAxLTIgMkg0YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDVsMiAzaDlhMiAyIDAgMCAxIDIgMnptMCA2SDRhMiAyIDAgMCAxLTItMlY4YTIgMiAwIDAgMSAyLTJoNCI+PC9wYXRoPjwvc3ZnPg==';
   const DEFAULT_FILE_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTMgMkg2YTIgMiAwIDAgMC0yIDJ2MTZhMiAyIDAgMCAwIDIgMmgxMmEyIDIgMCAwIDAgMi0yVjlsLTctN3oiPjwvcGF0aD48cG9seWxpbmUgcG9pbnRzPSIxMyAyIDEzIDkgMjAgOSI+PC9wb2x5bGluZT48L3N2Zz4=';
 
   /**
@@ -189,11 +193,12 @@
   function getIconUrl(node) {
     // Folders
     if (node.children || node.type === 'directory') {
+      const isExpanded = expandedFolders.has(node.path);
       const folderName = node.name.toLowerCase();
       if (FOLDER_ICON_MAP[folderName]) {
         return `${DEVICON_BASE}/${FOLDER_ICON_MAP[folderName]}`;
       }
-      return DEFAULT_FOLDER_ICON;
+      return isExpanded ? DEFAULT_FOLDER_OPEN : DEFAULT_FOLDER_CLOSED;
     }
     
     // Files - check special filenames first
@@ -260,7 +265,7 @@
         (error) => {
           console.warn('⚠️ Failed to load icon:', iconUrl, error);
           // Try fallback
-          const fallbackUrl = node.children ? DEFAULT_FOLDER_ICON : DEFAULT_FILE_ICON;
+          const fallbackUrl = node.children ? DEFAULT_FOLDER_CLOSED : DEFAULT_FILE_ICON;
           if (iconUrl !== fallbackUrl) {
             texture = new THREE.TextureLoader().load(fallbackUrl);
             textureCache.set(iconUrl, texture);
@@ -296,36 +301,53 @@
     
     sprite.scale.set(scale, scale, 1);
     
+    // Add glow effect for expanded folders
+    if (node.children && expandedFolders.has(node.path)) {
+      sprite.material.opacity = 1.0;
+      // Create glow ring around expanded folders
+      const glowGeometry = new THREE.RingGeometry(scale * 0.8, scale * 1.1, 32);
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffd700,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.DoubleSide
+      });
+      const glowRing = new THREE.Mesh(glowGeometry, glowMaterial);
+      sprite.add(glowRing);
+    }
+    
     return sprite;
   }
 
-  // Initialize particles.js background
+  // Initialize particles.js background - MORE BEAUTIFUL!
   function initParticles() {
     if (typeof particlesJS === 'undefined') return;
     particlesJS('particles-bg', {
       particles: {
-        number: { value: 60, density: { enable: true, value_area: 800 } },
-        color: { value: '#4a9eff' },
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: ['#4a9eff', '#ffd700', '#4ade80', '#f87171'] },
         shape: { type: 'circle' },
-        opacity: { value: 0.25, random: false },
-        size: { value: 2, random: true },
+        opacity: { value: 0.3, random: true },
+        size: { value: 3, random: true },
         line_linked: {
           enable: true, distance: 150, color: '#4a9eff',
-          opacity: 0.15, width: 1
+          opacity: 0.2, width: 1.5
         },
         move: {
-          enable: true, speed: 0.8, direction: 'none',
-          random: false, straight: false, out_mode: 'out'
+          enable: true, speed: 1.2, direction: 'none',
+          random: true, straight: false, out_mode: 'out'
         }
       },
       interactivity: {
         detect_on: 'canvas',
         events: {
           onhover: { enable: true, mode: 'grab' },
+          onclick: { enable: true, mode: 'push' },
           resize: true
         },
         modes: {
-          grab: { distance: 140, line_linked: { opacity: 0.4 } }
+          grab: { distance: 180, line_linked: { opacity: 0.5 } },
+          push: { particles_nb: 3 }
         }
       },
       retina_detect: true
@@ -355,15 +377,24 @@
           const type = node.children ? 'folder' : 'file';
           const size = node.size ? formatBytes(node.size) : 'N/A';
           const fileCount = node.children ? countFiles(node) : null;
+          const isExpanded = node.children && expandedFolders.has(node.path);
+          const expandIcon = isExpanded ? '🔼' : '🔽';
           
           return `
-            <div style="background: rgba(0,0,0,0.9); padding: 10px; border-radius: 6px; color: white; max-width: 350px; font-family: 'Segoe UI', sans-serif;">
-              <strong style="font-size: 14px; color: #4a9eff;">${node.name}</strong><br/>
-              <div style="margin-top: 6px; font-size: 12px;">
-                <div><span style="color: #ffd700;">${type === 'folder' ? '📁' : '📄'}</span> ${type}</div>
-                <div>Size: <span style="color: #4ade80;">${size}</span></div>
-                ${fileCount ? `<div>Files: <span style="color: #fbbf24;">${fileCount}</span></div>` : ''}
-                <div style="margin-top: 4px; color: #999; font-size: 11px;">${node.path}</div>
+            <div style="background: rgba(0,0,0,0.95); padding: 12px; border-radius: 8px; color: white; max-width: 350px; font-family: 'Segoe UI', sans-serif; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+              <strong style="font-size: 15px; color: #4a9eff;">${node.name}</strong><br/>
+              <div style="margin-top: 8px; font-size: 12px; line-height: 1.6;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 16px;">${type === 'folder' ? '📁' : '📄'}</span>
+                  <span style="color: #fbbf24; font-weight: 500;">${type.toUpperCase()}</span>
+                  ${node.children ? `<span style="color: #4ade80; margin-left: auto;">${expandIcon} ${isExpanded ? 'Expanded' : 'Click to expand'}</span>` : ''}
+                </div>
+                <div style="margin-top: 6px;">
+                  <span style="color: #999;">Size:</span> <span style="color: #4ade80; font-weight: 500;">${size}</span>
+                </div>
+                ${fileCount ? `<div><span style="color: #999;">Files:</span> <span style="color: #fbbf24; font-weight: 500;">${fileCount}</span></div>` : ''}
+                ${node.children ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); color: #60a5fa; font-size: 11px;">💡 Click to ${isExpanded ? 'collapse' : 'expand'}</div>` : ''}
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); color: #9ca3af; font-size: 10px; font-family: 'Consolas', monospace;">${node.path}</div>
               </div>
             </div>
           `;
@@ -396,15 +427,28 @@
           return FILE_TYPE_COLORS[ext] || FILE_TYPE_COLORS.default;
         })
         
-        .nodeOpacity(0.9)
-        .nodeResolution(20)
+        .nodeOpacity(0.95)
+        .nodeResolution(24)
         
-        .linkColor(() => 'rgba(74, 158, 255, 0.25)')
-        .linkWidth(1.5)
-        .linkOpacity(0.25)
-        .linkDirectionalParticles(2)
-        .linkDirectionalParticleSpeed(0.003)
-        .linkDirectionalParticleWidth(1.5)
+        .linkColor(link => {
+          // Brighter links for expanded folders
+          const sourceNode = allNodes.find(n => n.id === link.source.id || n.id === link.source);
+          if (sourceNode && expandedFolders.has(sourceNode.path)) {
+            return 'rgba(255, 215, 0, 0.4)'; // Gold for expanded
+          }
+          return 'rgba(74, 158, 255, 0.3)';
+        })
+        .linkWidth(link => {
+          const sourceNode = allNodes.find(n => n.id === link.source.id || n.id === link.source);
+          return sourceNode && expandedFolders.has(sourceNode.path) ? 2.5 : 1.5;
+        })
+        .linkOpacity(0.35)
+        .linkDirectionalParticles(link => {
+          const sourceNode = allNodes.find(n => n.id === link.source.id || n.id === link.source);
+          return sourceNode && expandedFolders.has(sourceNode.path) ? 4 : 2;
+        })
+        .linkDirectionalParticleSpeed(0.004)
+        .linkDirectionalParticleWidth(2)
         
         .onNodeClick(node => {
           console.log('Node clicked:', node);
@@ -427,9 +471,8 @@
             console.log('Opening file:', node.path);
             vscode.postMessage({ type: 'openFile', path: node.path });
           } else {
-            // It's a folder - focus on it
-            console.log('Focusing on folder:', node.name);
-            focusOnNode(node);
+            // It's a folder - toggle expand/collapse
+            toggleFolderExpansion(node);
           }
         })
         .onNodeHover(node => {
@@ -458,11 +501,12 @@
   }
 
   // Convert tree to graph with hierarchy
+  // Convert tree to graph with hierarchy (respecting expanded state)
   function treeToGraph(tree) {
-    const nodes = [];
-    const links = [];
+    allNodes = [];
+    allLinks = [];
 
-    function traverse(node, parent = null, level = 0) {
+    function traverse(node, parent = null, level = 0, shouldShow = true) {
       const nodeData = {
         id: node.path,
         name: node.name,
@@ -472,25 +516,127 @@
         children: node.children,
         level: level,
         modified: false,
-        highlighted: false
+        highlighted: false,
+        parent: parent
       };
       
-      nodes.push(nodeData);
+      allNodes.push(nodeData);
 
-      if (parent) {
-        links.push({
+      if (parent && shouldShow) {
+        allLinks.push({
           source: parent.path,
           target: node.path
         });
       }
 
+      // Only traverse children if this folder is expanded
       if (node.children) {
-        node.children.forEach(child => traverse(child, node, level + 1));
+        const isExpanded = expandedFolders.has(node.path);
+        node.children.forEach(child => {
+          traverse(child, node, level + 1, shouldShow && isExpanded);
+        });
       }
     }
 
     traverse(tree);
-    return { nodes, links };
+    
+    // Filter visible nodes and links
+    const visibleNodes = allNodes.filter(node => {
+      if (!node.parent) return true; // Root is always visible
+      return isNodeVisible(node);
+    });
+    
+    const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
+    const visibleLinks = allLinks.filter(link => 
+      visibleNodeIds.has(link.source) && visibleNodeIds.has(link.target)
+    );
+    
+    return { nodes: visibleNodes, links: visibleLinks };
+  }
+  
+  // Check if node should be visible based on parent expansion
+  function isNodeVisible(node) {
+    if (!node.parent) return true;
+    if (!expandedFolders.has(node.parent.path)) return false;
+    return isNodeVisible(node.parent);
+  }
+  
+  // Toggle folder expansion
+  function toggleFolderExpansion(node) {
+    const wasExpanded = expandedFolders.has(node.path);
+    
+    if (wasExpanded) {
+      // Collapse: remove this folder and all descendants from expanded set
+      console.log('🔽 Collapsing folder:', node.name);
+      expandedFolders.delete(node.path);
+      collapseDescendants(node);
+    } else {
+      // Expand: add to expanded set
+      console.log('🔼 Expanding folder:', node.name);
+      expandedFolders.add(node.path);
+    }
+    
+    // Rebuild and update graph
+    refreshGraph();
+  }
+  
+  // Collapse all descendants
+  function collapseDescendants(node) {
+    if (node.children) {
+      node.children.forEach(child => {
+        if (child.children) {
+          expandedFolders.delete(child.path);
+          collapseDescendants(child);
+        }
+      });
+    }
+  }
+  
+  // Refresh graph with current expanded state
+  function refreshGraph() {
+    if (!currentTree || !graph) return;
+    
+    const graphData = treeToGraph(currentTree);
+    
+    // Smooth transition
+    graph.graphData(graphData);
+    
+    // Update sprites for expanded/collapsed state
+    setTimeout(() => {
+      graph.refresh();
+    }, 100);
+  }
+  
+  // Expand all folders
+  function expandAll() {
+    console.log('🔼 Expanding all folders');
+    
+    function addAllFolders(node) {
+      if (node.children) {
+        expandedFolders.add(node.path);
+        node.children.forEach(child => addAllFolders(child));
+      }
+    }
+    
+    if (currentTree) {
+      addAllFolders(currentTree);
+      refreshGraph();
+    }
+  }
+  
+  // Collapse all folders except root
+  function collapseAll() {
+    console.log('🔽 Collapsing all folders');
+    
+    const rootPath = currentTree?.path;
+    expandedFolders.clear();
+    
+    // Keep root expanded
+    if (rootPath) {
+      expandedFolders.add(rootPath);
+    }
+    
+    refreshGraph();
   }
 
   // Calculate total size recursively
@@ -747,6 +893,14 @@
   document.getElementById('reset')?.addEventListener('click', () => {
     if (graph) graph.zoomToFit(1000, 50);
   });
+  
+  document.getElementById('expand-all')?.addEventListener('click', () => {
+    expandAll();
+  });
+  
+  document.getElementById('collapse-all')?.addEventListener('click', () => {
+    collapseAll();
+  });
 
   document.getElementById('search-input')?.addEventListener('input', (e) => {
     const query = e.target.value;
@@ -768,6 +922,12 @@
     const message = event.data;
     if (message.type === 'update') {
       updateGraph(message.tree);
+      
+      // Auto-expand root folder on first load
+      if (message.tree && !expandedFolders.has(message.tree.path)) {
+        expandedFolders.add(message.tree.path);
+        refreshGraph();
+      }
     }
   });
 

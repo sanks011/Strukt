@@ -148,6 +148,8 @@ export class ProjectMapProvider {
     <div class="control-group">
       <button id="fit" title="Fit to Screen"><i data-feather="maximize"></i> Fit</button>
       <button id="reset" title="Reset View"><i data-feather="rotate-ccw"></i> Reset</button>
+      <button id="expand-all" title="Expand All Folders"><i data-feather="chevrons-down"></i> Expand All</button>
+      <button id="collapse-all" title="Collapse All Folders"><i data-feather="chevrons-up"></i> Collapse All</button>
     </div>
     
     <div class="search-box">
