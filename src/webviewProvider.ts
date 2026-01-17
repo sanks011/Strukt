@@ -136,7 +136,7 @@ export class ProjectMapProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' https://unpkg.com; img-src https://cdn.jsdelivr.net data:; worker-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' https://unpkg.com; img-src https://api.iconify.design data:; worker-src 'none';">
   <link href="${styleUri}" rel="stylesheet">
   <script nonce="${nonce}" src="https://unpkg.com/feather-icons"></script>
   <title>Project Map - Strukt</title>
@@ -146,10 +146,8 @@ export class ProjectMapProvider {
   
   <div id="controls">
     <div class="control-group">
-      <button id="fit" title="Fit to Screen"><i data-feather="maximize"></i> Fit</button>
-      <button id="reset" title="Reset View"><i data-feather="rotate-ccw"></i> Reset</button>
-      <button id="expand-all" title="Expand All Folders"><i data-feather="chevrons-down"></i> Expand All</button>
-      <button id="collapse-all" title="Collapse All Folders"><i data-feather="chevrons-up"></i> Collapse All</button>
+      <button id="fit" title="Fit to Screen" style="padding: 6px 10px; font-size: 12px;"><i data-feather="maximize"></i></button>
+      <button id="reset" title="Reset View" style="padding: 6px 10px; font-size: 12px;"><i data-feather="rotate-ccw"></i></button>
     </div>
     
     <div class="search-box">

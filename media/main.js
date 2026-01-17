@@ -29,157 +29,144 @@
   // Texture cache to avoid reloading same icons
   const textureCache = new Map();
 
-  // Devicon CDN base URL
-  const DEVICON_BASE = 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons';
+  // Iconify API CDN - Much better icon source!
+  const ICONIFY_BASE = 'https://api.iconify.design';
 
-  // File extension to Devicon icon mapping
+  // File extension to icon mapping using VSCode Icons (more accurate!)
   const FILE_ICON_MAP = {
     // JavaScript ecosystem
-    js: 'javascript/javascript-original.svg',
-    jsx: 'react/react-original.svg',
-    ts: 'typescript/typescript-original.svg',
-    tsx: 'react/react-original.svg',
-    json: 'json/json-original.svg',
+    js: 'vscode-icons:file-type-js-official',
+    jsx: 'vscode-icons:file-type-reactjs',
+    ts: 'vscode-icons:file-type-typescript-official',
+    tsx: 'vscode-icons:file-type-reactts',
+    json: 'vscode-icons:file-type-json',
     
     // Web
-    html: 'html5/html5-original.svg',
-    htm: 'html5/html5-original.svg',
-    css: 'css3/css3-original.svg',
-    scss: 'sass/sass-original.svg',
-    sass: 'sass/sass-original.svg',
-    less: 'less/less-plain-wordmark.svg',
+    html: 'vscode-icons:file-type-html',
+    htm: 'vscode-icons:file-type-html',
+    css: 'vscode-icons:file-type-css',
+    scss: 'vscode-icons:file-type-scss',
+    sass: 'vscode-icons:file-type-sass',
+    less: 'vscode-icons:file-type-less',
     
     // Python
-    py: 'python/python-original.svg',
-    pyw: 'python/python-original.svg',
-    ipynb: 'jupyter/jupyter-original.svg',
+    py: 'vscode-icons:file-type-python',
+    pyw: 'vscode-icons:file-type-python',
+    ipynb: 'vscode-icons:file-type-jupyter',
     
     // C family
-    c: 'c/c-original.svg',
-    cpp: 'cplusplus/cplusplus-original.svg',
-    cc: 'cplusplus/cplusplus-original.svg',
-    cxx: 'cplusplus/cplusplus-original.svg',
-    h: 'c/c-original.svg',
-    hpp: 'cplusplus/cplusplus-original.svg',
-    cs: 'csharp/csharp-original.svg',
+    c: 'vscode-icons:file-type-c',
+    cpp: 'vscode-icons:file-type-cpp',
+    cc: 'vscode-icons:file-type-cpp',
+    cxx: 'vscode-icons:file-type-cpp',
+    h: 'vscode-icons:file-type-cheader',
+    hpp: 'vscode-icons:file-type-cpp',
+    cs: 'vscode-icons:file-type-csharp',
     
     // Other languages
-    java: 'java/java-original.svg',
-    go: 'go/go-original-wordmark.svg',
-    rs: 'rust/rust-original.svg',
-    rb: 'ruby/ruby-original.svg',
-    php: 'php/php-original.svg',
-    swift: 'swift/swift-original.svg',
-    kt: 'kotlin/kotlin-original.svg',
-    scala: 'scala/scala-original.svg',
+    java: 'vscode-icons:file-type-java',
+    go: 'vscode-icons:file-type-go',
+    rs: 'vscode-icons:file-type-rust',
+    rb: 'vscode-icons:file-type-ruby',
+    php: 'vscode-icons:file-type-php',
+    swift: 'vscode-icons:file-type-swift',
+    kt: 'vscode-icons:file-type-kotlin',
+    scala: 'vscode-icons:file-type-scala',
     
     // Markup & Data
-    md: 'markdown/markdown-original.svg',
-    xml: 'xml/xml-original.svg',
-    yaml: 'yaml/yaml-original.svg',
-    yml: 'yaml/yaml-original.svg',
-    toml: 'toml/toml-original.svg',
+    md: 'vscode-icons:file-type-markdown',
+    xml: 'vscode-icons:file-type-xml',
+    yaml: 'vscode-icons:file-type-yaml',
+    yml: 'vscode-icons:file-type-yaml',
+    toml: 'vscode-icons:file-type-toml',
     
     // Shell
-    sh: 'bash/bash-original.svg',
-    bash: 'bash/bash-original.svg',
-    zsh: 'bash/bash-original.svg',
-    ps1: 'powershell/powershell-original.svg',
+    sh: 'vscode-icons:file-type-shell',
+    bash: 'vscode-icons:file-type-shell',
+    zsh: 'vscode-icons:file-type-shell',
+    ps1: 'vscode-icons:file-type-powershell',
     
     // Build & Config
-    dockerfile: 'docker/docker-original.svg',
-    makefile: 'cmake/cmake-original.svg',
-    gradle: 'gradle/gradle-original.svg',
+    dockerfile: 'vscode-icons:file-type-docker',
+    makefile: 'vscode-icons:file-type-makefile',
+    gradle: 'vscode-icons:file-type-gradle',
     
     // Databases
-    sql: 'mysql/mysql-original.svg',
+    sql: 'vscode-icons:file-type-sql',
     
     // Frameworks
-    vue: 'vuejs/vuejs-original.svg',
-    svelte: 'svelte/svelte-original.svg',
+    vue: 'vscode-icons:file-type-vue',
+    svelte: 'vscode-icons:file-type-svelte',
     
     // Other
-    dart: 'dart/dart-original.svg',
-    lua: 'lua/lua-original.svg',
-    r: 'r/r-original.svg',
+    dart: 'vscode-icons:file-type-dart',
+    lua: 'vscode-icons:file-type-lua',
+    r: 'vscode-icons:file-type-r',
     
     // Special files
-    txt: 'default', // Will use DEFAULT_FILE_ICON
-    log: 'default',
-    gitignore: 'git/git-original.svg',
-    env: 'nodejs/nodejs-original.svg',
-    npmrc: 'npm/npm-original-wordmark.svg',
-    editorconfig: 'vscode/vscode-original.svg',
-    prettierrc: 'prettier/prettier-original.svg'
+    txt: 'vscode-icons:file-type-text',
+    log: 'vscode-icons:file-type-log',
+    gitignore: 'vscode-icons:file-type-git',
+    env: 'vscode-icons:file-type-dotenv',
+    npmrc: 'vscode-icons:file-type-npm',
+    editorconfig: 'vscode-icons:file-type-editorconfig',
+    prettierrc: 'vscode-icons:file-type-prettier'
   };
 
-  // Special folder name detection
+  // Special folder name detection - Now with proper VSCode icons!
   const FOLDER_ICON_MAP = {
-    // Frontend/UI folders
-    'components': 'react/react-original.svg',
-    'component': 'react/react-original.svg',
-    'views': 'vuejs/vuejs-original.svg',
-    'pages': 'nextjs/nextjs-original.svg',
-    'layouts': 'html5/html5-original.svg',
+    // Common dev folders
+    'src': 'vscode-icons:folder-type-src',
+    'dist': 'vscode-icons:folder-type-dist',
+    'build': 'vscode-icons:folder-type-buildtools',
+    'public': 'vscode-icons:folder-type-public',
     
-    // Backend folders
-    'server': 'nodejs/nodejs-original.svg',
-    'api': 'nodejs/nodejs-original.svg',
-    'backend': 'nodejs/nodejs-original.svg',
-    'services': 'nodejs/nodejs-original.svg',
+    // Component folders
+    'components': 'vscode-icons:folder-type-component',
+    'component': 'vscode-icons:folder-type-component',
     
-    // Frontend client
-    'client': 'react/react-original.svg',
-    'frontend': 'react/react-original.svg',
-    'app': 'react/react-original.svg',
+    // Config
+    'config': 'vscode-icons:folder-type-config',
+    'configs': 'vscode-icons:folder-type-config',
     
-    // Common folders
-    'src': 'javascript/javascript-original.svg',
-    'lib': 'npm/npm-original-wordmark.svg',
-    'utils': 'javascript/javascript-original.svg',
-    'helpers': 'javascript/javascript-original.svg',
-    'config': 'yaml/yaml-original.svg',
-    'configs': 'yaml/yaml-original.svg',
-    
-    // Build/Deploy
-    'dist': 'webpack/webpack-original.svg',
-    'build': 'webpack/webpack-original.svg',
-    'public': 'html5/html5-original.svg',
-    '.github': 'github/github-original.svg',
-    '.vscode': 'vscode/vscode-original.svg',
-    
-    // Testing
-    'tests': 'jest/jest-plain.svg',
-    'test': 'jest/jest-plain.svg',
-    '__tests__': 'jest/jest-plain.svg',
-    'spec': 'jest/jest-plain.svg',
+    // Tests
+    'test': 'vscode-icons:folder-type-test',
+    'tests': 'vscode-icons:folder-type-test',
+    '__tests__': 'vscode-icons:folder-type-test',
+    'spec': 'vscode-icons:folder-type-test',
     
     // Assets
-    'assets': 'figma/figma-original.svg',
-    'images': 'figma/figma-original.svg',
-    'img': 'figma/figma-original.svg',
-    'icons': 'figma/figma-original.svg',
-    'static': 'html5/html5-original.svg',
+    'assets': 'vscode-icons:folder-type-assets',
+    'images': 'vscode-icons:folder-type-images',
+    'img': 'vscode-icons:folder-type-images',
+    'static': 'vscode-icons:folder-type-public',
     
     // Styles
-    'styles': 'css3/css3-original.svg',
-    'css': 'css3/css3-original.svg',
-    'scss': 'sass/sass-original.svg',
+    'styles': 'vscode-icons:folder-type-css',
+    'css': 'vscode-icons:folder-type-css',
+    'scss': 'vscode-icons:folder-type-sass',
     
-    // Documentation
-    'docs': 'markdown/markdown-original.svg',
-    'doc': 'markdown/markdown-original.svg',
-    'documentation': 'markdown/markdown-original.svg',
+    // Docs
+    'docs': 'vscode-icons:folder-type-docs',
+    'doc': 'vscode-icons:folder-type-docs',
+    'documentation': 'vscode-icons:folder-type-docs',
     
-    // Database
-    'models': 'mysql/mysql-original.svg',
-    'database': 'mysql/mysql-original.svg',
-    'migrations': 'mysql/mysql-original.svg',
+    // Utility
+    'utils': 'vscode-icons:folder-type-utils',
+    'helpers': 'vscode-icons:folder-type-helper',
+    'lib': 'vscode-icons:folder-type-library',
+    'libraries': 'vscode-icons:folder-type-library',
     
-    // Node modules
-    'node_modules': 'npm/npm-original-wordmark.svg',
-    'packages': 'npm/npm-original-wordmark.svg',
-    'vendor': 'composer/composer-original.svg'
+    // Server/API
+    'api': 'vscode-icons:folder-type-api',
+    'server': 'vscode-icons:folder-type-server',
+    'backend': 'vscode-icons:folder-type-server',
+    
+    // Git/Editor
+    'node_modules': 'vscode-icons:folder-type-node',
+    '.github': 'vscode-icons:folder-type-github',
+    '.vscode': 'vscode-icons:folder-type-vscode',
+    '.git': 'vscode-icons:folder-type-git'
   };
 
   // Default fallback icons (using data URIs for guaranteed availability)
@@ -195,50 +182,57 @@
     if (node.children || node.type === 'directory') {
       const isExpanded = expandedFolders.has(node.path);
       const folderName = node.name.toLowerCase();
+      
+      // Check if special folder
       if (FOLDER_ICON_MAP[folderName]) {
-        return `${DEVICON_BASE}/${FOLDER_ICON_MAP[folderName]}`;
+        const iconId = FOLDER_ICON_MAP[folderName];
+        return `${ICONIFY_BASE}/${iconId}.svg?color=%234a9eff`;
       }
-      return isExpanded ? DEFAULT_FOLDER_OPEN : DEFAULT_FOLDER_CLOSED;
+      
+      // Default folder icons
+      if (isExpanded) {
+        return `${ICONIFY_BASE}/vscode-icons:default-folder-opened.svg?color=%23ffd700`;
+      }
+      return `${ICONIFY_BASE}/vscode-icons:default-folder.svg?color=%234a9eff`;
     }
     
     // Files - check special filenames first
     const fileName = node.name.toLowerCase();
     
     // Special filename patterns
-    if (fileName === '.gitignore' || fileName === '.gitattributes') {
-      return `${DEVICON_BASE}/git/git-original.svg`;
-    }
-    if (fileName === '.env' || fileName === '.env.local' || fileName === '.env.example') {
-      return `${DEVICON_BASE}/nodejs/nodejs-original.svg`;
-    }
-    if (fileName === '.npmrc' || fileName === 'package.json' || fileName === 'package-lock.json') {
-      return `${DEVICON_BASE}/npm/npm-original-wordmark.svg`;
-    }
-    if (fileName === '.editorconfig') {
-      return `${DEVICON_BASE}/vscode/vscode-original.svg`;
-    }
-    if (fileName === '.prettierrc' || fileName === 'prettier.config.js') {
-      return `${DEVICON_BASE}/prettier/prettier-original.svg`;
-    }
-    if (fileName === 'dockerfile' || fileName.startsWith('dockerfile.')) {
-      return `${DEVICON_BASE}/docker/docker-original.svg`;
-    }
-    if (fileName === 'makefile') {
-      return `${DEVICON_BASE}/cmake/cmake-original.svg`;
-    }
-    if (fileName === 'readme.md' || fileName === 'readme') {
-      return `${DEVICON_BASE}/markdown/markdown-original.svg`;
+    const specialFiles = {
+      '.gitignore': 'vscode-icons:file-type-git',
+      '.gitattributes': 'vscode-icons:file-type-git',
+      '.env': 'vscode-icons:file-type-dotenv',
+      '.env.local': 'vscode-icons:file-type-dotenv',
+      '.env.example': 'vscode-icons:file-type-dotenv',
+      '.npmrc': 'vscode-icons:file-type-npm',
+      'package.json': 'vscode-icons:file-type-npm',
+      'package-lock.json': 'vscode-icons:file-type-npm',
+      '.editorconfig': 'vscode-icons:file-type-editorconfig',
+      '.prettierrc': 'vscode-icons:file-type-prettier',
+      'prettier.config.js': 'vscode-icons:file-type-prettier',
+      'dockerfile': 'vscode-icons:file-type-docker',
+      'makefile': 'vscode-icons:file-type-makefile',
+      'readme.md': 'vscode-icons:file-type-readme',
+      'readme': 'vscode-icons:file-type-readme'
+    };
+    
+    if (specialFiles[fileName] || (fileName.startsWith('dockerfile.'))) {
+      const iconId = specialFiles[fileName] || 'vscode-icons:file-type-docker';
+      return `${ICONIFY_BASE}/${iconId}.svg`;
     }
     
     // Check extension
     const ext = getFileExtension(node.name);
-    const mapping = FILE_ICON_MAP[ext];
+    const iconId = FILE_ICON_MAP[ext];
     
-    if (mapping && mapping !== 'default') {
-      return `${DEVICON_BASE}/${mapping}`;
+    if (iconId) {
+      return `${ICONIFY_BASE}/${iconId}.svg`;
     }
     
-    return DEFAULT_FILE_ICON;
+    // Default file icon
+    return `${ICONIFY_BASE}/vscode-icons:default-file.svg`;
   }
 
   /**
@@ -301,21 +295,6 @@
     
     sprite.scale.set(scale, scale, 1);
     
-    // Add glow effect for expanded folders
-    if (node.children && expandedFolders.has(node.path)) {
-      sprite.material.opacity = 1.0;
-      // Create glow ring around expanded folders
-      const glowGeometry = new THREE.RingGeometry(scale * 0.8, scale * 1.1, 32);
-      const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffd700,
-        transparent: true,
-        opacity: 0.3,
-        side: THREE.DoubleSide
-      });
-      const glowRing = new THREE.Mesh(glowGeometry, glowMaterial);
-      sprite.add(glowRing);
-    }
-    
     return sprite;
   }
 
@@ -367,7 +346,7 @@
       graph = ForceGraph3D()(container)
         .backgroundColor('rgba(30, 30, 30, 0.0)') // Transparent for particles
         .showNavInfo(false)
-        .enableNodeDrag(false) // Disable drag to maintain hierarchy
+        .enableNodeDrag(true) // Enable node dragging for interaction
         .enableNavigationControls(true)
         .dagMode('radialout') // Radial layout - root at center, files radiating out
         .dagLevelDistance(80) // Distance between hierarchy levels
@@ -430,25 +409,13 @@
         .nodeOpacity(0.95)
         .nodeResolution(24)
         
-        .linkColor(link => {
-          // Brighter links for expanded folders
-          const sourceNode = allNodes.find(n => n.id === link.source.id || n.id === link.source);
-          if (sourceNode && expandedFolders.has(sourceNode.path)) {
-            return 'rgba(255, 215, 0, 0.4)'; // Gold for expanded
-          }
-          return 'rgba(74, 158, 255, 0.3)';
-        })
-        .linkWidth(link => {
-          const sourceNode = allNodes.find(n => n.id === link.source.id || n.id === link.source);
-          return sourceNode && expandedFolders.has(sourceNode.path) ? 2.5 : 1.5;
-        })
-        .linkOpacity(0.35)
-        .linkDirectionalParticles(link => {
-          const sourceNode = allNodes.find(n => n.id === link.source.id || n.id === link.source);
-          return sourceNode && expandedFolders.has(sourceNode.path) ? 4 : 2;
-        })
-        .linkDirectionalParticleSpeed(0.004)
-        .linkDirectionalParticleWidth(2)
+        // Simple, clean connecting lines - NO particles, NO animations
+        .linkColor(() => 'rgba(255, 255, 255, 0.3)') // Clean white lines
+        .linkWidth(1) // Thin, minimal
+        .linkOpacity(0.3)
+        .linkDirectionalParticles(0) // NO particles - clean and simple
+        .linkDirectionalParticleSpeed(0)
+        .linkDirectionalParticleWidth(0)
         
         .onNodeClick(node => {
           console.log('Node clicked:', node);
@@ -892,14 +859,6 @@
 
   document.getElementById('reset')?.addEventListener('click', () => {
     if (graph) graph.zoomToFit(1000, 50);
-  });
-  
-  document.getElementById('expand-all')?.addEventListener('click', () => {
-    expandAll();
-  });
-  
-  document.getElementById('collapse-all')?.addEventListener('click', () => {
-    collapseAll();
   });
 
   document.getElementById('search-input')?.addEventListener('input', (e) => {
