@@ -94,15 +94,20 @@ export class ProjectMapProvider {
 
   private async sendTreeData(): Promise<void> {
     if (!this.panel) {
+      console.log('[Strukt] No panel to send data to');
       return;
     }
 
+    console.log('[Strukt] Sending tree data...');
     const config = vscode.workspace.getConfiguration('strukt');
     const maxDepth = config.get<number>('maxDepth', 10);
     const excludePatterns = config.get<string[]>('excludePatterns', []);
     const layout = config.get<string>('layout', 'breadthfirst');
 
+    console.log('[Strukt] Config - maxDepth:', maxDepth, 'excludePatterns:', excludePatterns);
+
     const tree = await this.treeBuilder.buildTree(maxDepth, excludePatterns);
+    console.log('[Strukt] Tree object:', tree);
 
     // Only send data via postMessage - don't recreate HTML!
     this.panel.webview.postMessage({
@@ -110,6 +115,7 @@ export class ProjectMapProvider {
       tree,
       layout
     });
+    console.log('[Strukt] Tree data sent to webview');
   }
 
   private getHtmlContent(webview: vscode.Webview): string {
@@ -119,15 +125,11 @@ export class ProjectMapProvider {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, 'media', 'style.css')
     );
-    const threeUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'three', 'build', 'three.min.js')
-    );
-    const forceGraphUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'node_modules', '3d-force-graph', 'dist', '3d-force-graph.min.js')
-    );
-    const particlesUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'node_modules', 'particles.js', 'particles.js')
-    );
+    
+    // Use CDN URLs for libraries since node_modules is excluded from package
+    const threeUri = 'https://unpkg.com/three@0.159.0/build/three.min.js';
+    const forceGraphUri = 'https://unpkg.com/3d-force-graph@1.73.2/dist/3d-force-graph.min.js';
+    const particlesUri = 'https://unpkg.com/particles.js@2.0.0/particles.js';
 
     const nonce = this.getNonce();
 

@@ -14,7 +14,11 @@ export class FileTreeBuilder {
   public async buildTree(maxDepth: number, excludePatterns: string[]): Promise<FileNode> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     
+    console.log('[Strukt] Building tree with maxDepth:', maxDepth, 'excludePatterns:', excludePatterns);
+    console.log('[Strukt] Workspace folders:', workspaceFolders?.length || 0);
+    
     if (!workspaceFolders || workspaceFolders.length === 0) {
+      console.warn('[Strukt] No workspace folder found!');
       return {
         name: 'No workspace',
         type: 'folder',
@@ -24,7 +28,20 @@ export class FileTreeBuilder {
     }
 
     const rootFolder = workspaceFolders[0];
-    return this.buildNode(rootFolder.uri, '', 0, maxDepth, excludePatterns);
+    console.log('[Strukt] Root folder:', rootFolder.uri.fsPath);
+    const tree = await this.buildNode(rootFolder.uri, '', 0, maxDepth, excludePatterns);
+    console.log('[Strukt] Tree built with', this.countNodes(tree), 'nodes');
+    return tree;
+  }
+
+  private countNodes(node: FileNode): number {
+    let count = 1;
+    if (node.children) {
+      for (const child of node.children) {
+        count += this.countNodes(child);
+      }
+    }
+    return count;
   }
 
   private async buildNode(

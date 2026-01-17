@@ -982,7 +982,9 @@
   // Messages from extension
   window.addEventListener('message', event => {
     const message = event.data;
+    console.log('[Strukt Webview] Received message:', message.type, message);
     if (message.type === 'update') {
+      console.log('[Strukt Webview] Tree data:', message.tree);
       updateGraph(message.tree);
       
       // Auto-expand root folder on first load
@@ -994,10 +996,11 @@
   });
 
   // Initialize
-  console.log('Initializing Strukt...');
+  console.log('[Strukt Webview] Initializing Strukt...');
   setTimeout(() => {
     initParticles();
     init3DGraph();
+    console.log('[Strukt Webview] Sending ready message to extension');
     vscode.postMessage({ type: 'ready' });
   }, 100);
 
