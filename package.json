@@ -40,8 +40,8 @@
       "properties": {
         "strukt.maxDepth": {
           "type": "number",
-          "default": 10,
-          "description": "Maximum folder depth to visualize"
+          "default": 3,
+          "description": "Maximum folder depth to visualize (lower = better performance)"
         },
         "strukt.excludePatterns": {
           "type": "array",

@@ -22,6 +22,26 @@ body {
   background-color: var(--vscode-sideBar-background);
   border-bottom: 1px solid var(--vscode-panel-border);
   flex-shrink: 0;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#zoom-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 15px;
+}
+
+#zoom-slider {
+  width: 150px;
+  cursor: pointer;
+}
+
+#zoom-level {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  min-width: 45px;
 }
 
 button {

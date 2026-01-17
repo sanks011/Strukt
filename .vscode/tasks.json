@@ -10,25 +10,27 @@
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": {
-        "owner": "typescript",
-        "source": "ts",
-        "applyTo": "closedDocuments",
-        "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": {
-          "regexp": "^([^\\s].*):?(\\d+):?(\\d+)?:?\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "severity": 4,
-          "code": 5,
-          "message": 6
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^\\[watch\\] build started",
-          "endsPattern": "^\\[watch\\] build finished"
+      "problemMatcher": [
+        {
+          "owner": "typescript",
+          "applyTo": "closedDocuments",
+          "fileLocation": "relative",
+          "pattern": {
+            "regexp": "ERROR",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "message": 4
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "Starting compilation",
+            "endsPattern": "(Watching for file changes|Found 0 errors)"
+          }
         }
+      ],
+      "presentation": {
+        "reveal": "never"
       }
     },
     {

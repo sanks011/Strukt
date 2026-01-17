@@ -136,6 +136,11 @@ export class ProjectMapProvider {
       <option value="circle">Circle</option>
       <option value="grid">Grid</option>
     </select>
+    <div id="zoom-container">
+      <label for="zoom-slider">Zoom:</label>
+      <input type="range" id="zoom-slider" min="5" max="500" value="100" step="5">
+      <span id="zoom-level">100%</span>
+    </div>
   </div>
   <div id="cy"></div>
   <div id="info"></div>
