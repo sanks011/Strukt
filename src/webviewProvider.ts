@@ -136,8 +136,9 @@ export class ProjectMapProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; worker-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' https://unpkg.com; worker-src 'none';">
   <link href="${styleUri}" rel="stylesheet">
+  <script nonce="${nonce}" src="https://unpkg.com/feather-icons"></script>
   <title>Project Map - Strukt</title>
 </head>
 <body>
@@ -145,48 +146,60 @@ export class ProjectMapProvider {
   
   <div id="controls">
     <div class="control-group">
-      <button id="fit" title="Fit to Screen">🔍 Fit</button>
-      <button id="reset" title="Reset View">🎯 Reset</button>
+      <button id="fit" title="Fit to Screen"><i data-feather="maximize"></i> Fit</button>
+      <button id="reset" title="Reset View"><i data-feather="rotate-ccw"></i> Reset</button>
     </div>
     
     <div class="search-box">
-      <input type="text" id="search-input" placeholder="🔍 Search files..." />
-      <button id="search-clear" title="Clear search">✕</button>
+      <i data-feather="search"></i>
+      <input type="text" id="search-input" placeholder="Search files..." />
+      <button id="search-clear" title="Clear search"><i data-feather="x"></i></button>
     </div>
     
     <div id="search-info" style="display: none;"></div>
+    
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-icon" style="background: #4a9eff;"></span>
+        <span class="legend-text">Folders</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-icon" style="background: #888;"></span>
+        <span class="legend-text">Files (size = node size)</span>
+      </div>
+    </div>
   </div>
   
   <div id="breadcrumb"></div>
   
   <div id="stats-panel">
     <div class="stats-header">
-      <h3>📊 Project Stats</h3>
+      <h3><i data-feather="bar-chart-2"></i> Project Stats</h3>
       <button id="toggle-stats" title="Toggle stats">−</button>
     </div>
     <div class="stats-content">
       <div class="stat-item">
-        <span class="stat-label">Files:</span>
+        <span class="stat-label"><i data-feather="file-text"></i> Files:</span>
         <span class="stat-value" id="total-files">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Folders:</span>
+        <span class="stat-label"><i data-feather="folder"></i> Folders:</span>
         <span class="stat-value" id="total-folders">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Total Size:</span>
+        <span class="stat-label"><i data-feather="database"></i> Total Size:</span>
         <span class="stat-value" id="total-size">0 B</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Max Depth:</span>
+        <span class="stat-label"><i data-feather="layers"></i> Max Depth:</span>
         <span class="stat-value" id="deepest-level">0</span>
       </div>
       <div class="stat-section">
-        <h4>File Types</h4>
+        <h4><i data-feather="list"></i> File Types</h4>
         <ul id="file-types"></ul>
       </div>
       <div class="stat-section">
-        <h4>Largest Files</h4>
+        <h4><i data-feather="trending-up"></i> Largest Files</h4>
         <ul id="largest-files"></ul>
       </div>
     </div>
@@ -215,6 +228,12 @@ export class ProjectMapProvider {
           const script4 = document.createElement('script');
           script4.nonce = nonce;
           script4.src = '${scriptUri}';
+          script4.onload = () => {
+            // Replace all feather icon placeholders with actual SVG icons
+            if (typeof feather !== 'undefined') {
+              feather.replace();
+            }
+          };
           document.body.appendChild(script4);
         };
         document.body.appendChild(script3);
@@ -261,7 +280,7 @@ export class ProjectMapProvider {
     try {
       const document = await vscode.workspace.openTextDocument(fileUri);
       await vscode.window.showTextDocument(document);
-      console.log('✅ File opened successfully');
+      console.log('File opened successfully');
     } catch (error) {
       console.error('Failed to open file:', error);
       vscode.window.showErrorMessage(`Could not open file: ${relativePath}`);

@@ -65,8 +65,10 @@
       graph = ForceGraph3D()(container)
         .backgroundColor('rgba(30, 30, 30, 0.0)') // Transparent for particles
         .showNavInfo(false)
-        .enableNodeDrag(true)
+        .enableNodeDrag(false) // Disable drag to maintain hierarchy
         .enableNavigationControls(true)
+        .dagMode('radialout') // Radial layout - root at center, files radiating out
+        .dagLevelDistance(80) // Distance between hierarchy levels
         
         // Rich tooltips with FILE PATH - actually useful!
         .nodeLabel(node => {
@@ -78,10 +80,10 @@
             <div style="background: rgba(0,0,0,0.9); padding: 10px; border-radius: 6px; color: white; max-width: 350px; font-family: 'Segoe UI', sans-serif;">
               <strong style="font-size: 14px; color: #4a9eff;">${node.name}</strong><br/>
               <div style="margin-top: 6px; font-size: 12px;">
-                <div>📁 Type: <span style="color: #ffd700;">${type}</span></div>
-                <div>📏 Size: <span style="color: #4ade80;">${size}</span></div>
-                ${fileCount ? `<div>📊 Files: <span style="color: #fbbf24;">${fileCount}</span></div>` : ''}
-                <div style="margin-top: 4px; color: #999; font-size: 11px;">🔍 ${node.path}</div>
+                <div><span style="color: #ffd700;">${type === 'folder' ? '📁' : '📄'}</span> ${type}</div>
+                <div>Size: <span style="color: #4ade80;">${size}</span></div>
+                ${fileCount ? `<div>Files: <span style="color: #fbbf24;">${fileCount}</span></div>` : ''}
+                <div style="margin-top: 4px; color: #999; font-size: 11px;">${node.path}</div>
               </div>
             </div>
           `;
@@ -90,11 +92,13 @@
         // Node size = file size (HELPS FIND BLOAT!)
         .nodeVal(node => {
           if (node.children) {
+            // Folders are larger and more visible
             const totalSize = calculateTotalSize(node);
-            return Math.max(12, Math.min(35, totalSize / 8000));
+            return Math.max(20, Math.min(45, totalSize / 6000));
           } else {
+            // Files sized by actual file size
             const size = node.size || 1000;
-            return Math.max(5, Math.min(18, size / 3000));
+            return Math.max(8, Math.min(25, size / 2000));
           }
         })
         
@@ -146,20 +150,21 @@
         })
         .onNodeHover(node => {
           updateBreadcrumb(node);
-          container.style.cursor = node ? 'pointer' : 'default';
+          container.style.cursor = node ? 'pointer' : 'grab';
         })
         
         .d3VelocityDecay(0.25)
         .warmupTicks(100)
         .cooldownTicks(300);
 
-      // Better hierarchy forces
-      graph.d3Force('charge').strength(-150);
+      // Radial hierarchy forces - clearer structure
+      graph.d3Force('charge').strength(-200);
       graph.d3Force('link').distance(link => {
-        return link.source.children ? 60 : 35;
+        // Folders farther apart, files closer to parent
+        return link.source.children ? 80 : 45;
       });
 
-      console.log('✅ 3D Graph initialized');
+      console.log('3D Graph initialized');
       return graph;
     } catch (error) {
       console.error('❌ Graph init error:', error);
@@ -483,7 +488,7 @@
   });
 
   // Initialize
-  console.log('🚀 Initializing Strukt...');
+  console.log('Initializing Strukt...');
   setTimeout(() => {
     initParticles();
     init3DGraph();
