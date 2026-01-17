@@ -10,3 +10,7 @@ tsconfig.json
 esbuild.js
 **/*.map
 **/.DS_Store
+.github/**
+create-icon.js
+resources/icon-source.svg
+*.vsix
