@@ -6,7 +6,7 @@ let projectMapProvider: ProjectMapProvider | undefined;
 export function activate(context: vscode.ExtensionContext) {
   console.log('Strukt extension is now active');
 
-  // Initialize the webview provider
+  // Initialize the webview provider (for command palette and sidebar button)
   projectMapProvider = new ProjectMapProvider(context.extensionUri);
 
   // Register command to open project map
@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
   const refreshMapCommand = vscode.commands.registerCommand('strukt.refreshProjectMap', () => {
     projectMapProvider?.refresh();
   });
-
+  
   context.subscriptions.push(openMapCommand, refreshMapCommand);
 }
 

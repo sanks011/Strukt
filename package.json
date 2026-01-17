@@ -19,10 +19,35 @@
     "folder structure"
   ],
   "activationEvents": [
-    "onCommand:strukt.openProjectMap"
+    "onView:strukt.projectMapView"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "strukt-explorer",
+          "title": "Strukt Project Map",
+          "icon": "resources/strukt-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "strukt-explorer": [
+        {
+          "id": "strukt.projectMapView",
+          "name": "Project Structure",
+          "icon": "resources/strukt-icon.svg",
+          "contextualTitle": "Strukt"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "strukt.projectMapView",
+        "contents": "Visualize your project structure in 3D.\n[Open Project Map](command:strukt.openProjectMap)"
+      }
+    ],
     "commands": [
       {
         "command": "strukt.openProjectMap",
@@ -88,6 +113,7 @@
     "@vscode/test-electron": "^2.3.8",
     "esbuild": "^0.19.11",
     "npm-run-all": "^4.1.5",
+    "sharp": "^0.34.5",
     "typescript": "^5.3.3"
   },
   "dependencies": {
