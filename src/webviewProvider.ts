@@ -70,13 +70,20 @@ export class ProjectMapProvider {
       message => {
         switch (message.type) {
           case 'openFile':
+            console.log('Opening file:', message.path);
+            if (!message.path) {
+              console.error('No path provided in openFile message');
+              return;
+            }
             this.openFile(message.path);
             break;
           case 'ready':
+            console.log('Webview ready, sending tree data');
             // Send initial data when webview is ready
             this.sendTreeData();
             break;
           case 'refresh':
+            console.log('Manual refresh requested');
             // Manual refresh from webview button
             this.sendTreeData();
             break;
@@ -232,15 +239,31 @@ export class ProjectMapProvider {
   private async openFile(relativePath: string): Promise<void> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
+      console.error('No workspace folder found');
+      vscode.window.showErrorMessage('No workspace folder is open');
       return;
     }
 
-    const fileUri = vscode.Uri.joinPath(workspaceFolders[0].uri, relativePath);
+    console.log('Attempting to open file:', relativePath);
+    
+    // Handle both relative and absolute paths
+    let fileUri: vscode.Uri;
+    if (relativePath.includes(':')) {
+      // Absolute path (Windows/Unix)
+      fileUri = vscode.Uri.file(relativePath);
+    } else {
+      // Relative path
+      fileUri = vscode.Uri.joinPath(workspaceFolders[0].uri, relativePath);
+    }
+    
+    console.log('Resolved file URI:', fileUri.toString());
     
     try {
       const document = await vscode.workspace.openTextDocument(fileUri);
       await vscode.window.showTextDocument(document);
+      console.log('✅ File opened successfully');
     } catch (error) {
+      console.error('Failed to open file:', error);
       vscode.window.showErrorMessage(`Could not open file: ${relativePath}`);
     }
   }

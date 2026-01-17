@@ -119,9 +119,28 @@
         .linkDirectionalParticleWidth(1.5)
         
         .onNodeClick(node => {
-          if (!node.children) {
+          console.log('Node clicked:', node);
+          
+          if (!node) {
+            console.warn('No node data on click');
+            return;
+          }
+          
+          // Check if it's a file (type === 'file' or has no children array with items)
+          const isFile = node.type === 'file' || !node.children || node.children.length === 0;
+          
+          if (isFile) {
+            // It's a file - try to open it
+            if (!node.path) {
+              console.error('Node has no path:', node);
+              return;
+            }
+            
+            console.log('Opening file:', node.path);
             vscode.postMessage({ type: 'openFile', path: node.path });
           } else {
+            // It's a folder - focus on it
+            console.log('Focusing on folder:', node.name);
             focusOnNode(node);
           }
         })
