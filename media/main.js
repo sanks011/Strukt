@@ -162,10 +162,9 @@
       
       case 'force-directed':
       default:
-        graph
-          .dagMode(null)
-          .d3Force('charge').strength(-200)
-          .d3Force('link').distance(80);
+        graph.dagMode(null);
+        graph.d3Force('charge').strength(-200);
+        graph.d3Force('link').distance(80);
         break;
     }
   }
