@@ -501,15 +501,10 @@
         })
         .nodeResolution(24)
         
-        // Simple, clean connecting lines with dependency visibility control
-        .linkColor(link => {
-          if (!filterState.showDependencies) return 'rgba(255, 255, 255, 0)'; // Hidden
-          return 'rgba(74, 158, 255, 0.3)'; // Visible blue lines
-        })
-        .linkWidth(link => filterState.showDependencies ? 0.5 : 0)
+        // Simple, clean blue connecting lines - always visible
+        .linkColor(() => 'rgba(74, 158, 255, 0.3)') // Blue lines
+        .linkWidth(0.5) // Consistent width
         .linkOpacity(link => {
-          if (!filterState.showDependencies) return 0;
-          
           // Fade links during search if neither node is highlighted
           const graphData = graph ? graph.graphData() : null;
           const hasHighlights = graphData && graphData.nodes.some(n => n.highlighted);
@@ -1069,7 +1064,6 @@
     fileTypes: new Set(['js', 'ts', 'json', 'md', 'css', 'html', 'folder']),
     maxDepth: 10,
     sizeFilter: 'all',
-    showDependencies: true,
     showLabels: true
   };
 
@@ -1099,9 +1093,7 @@
     });
     
     // Reset display options
-    filterState.showDependencies = true;
     filterState.showLabels = true;
-    document.getElementById('show-dependencies').checked = true;
     document.getElementById('show-labels').checked = true;
     
     applyFilters();
@@ -1151,22 +1143,10 @@
     });
   });
 
-  // Display options
-  document.getElementById('show-dependencies')?.addEventListener('change', (e) => {
-    filterState.showDependencies = e.target.checked;
-    // Update link visibility
-    if (graph) {
-      graph.linkColor(link => filterState.showDependencies ? 'rgba(74, 158, 255, 0.3)' : 'rgba(255, 255, 255, 0)');
-      graph.linkWidth(filterState.showDependencies ? 0.5 : 0);
-    }
-  });
-
+  // Display options - Show Labels toggle
   document.getElementById('show-labels')?.addEventListener('change', (e) => {
     filterState.showLabels = e.target.checked;
-    // Toggle node labels visibility
-    if (graph) {
-      graph.nodeLabel(filterState.showLabels ? nodeLabel : () => '');
-    }
+    // Note: This only affects static labels, hover tooltips remain active via onNodeHover
   });
 
   // Apply filters to graph

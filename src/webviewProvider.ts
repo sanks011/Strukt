@@ -264,10 +264,6 @@ export class ProjectMapProvider {
         </div>
         <div class="section-content" id="display-content">
           <label class="filter-checkbox">
-            <input type="checkbox" id="show-dependencies" checked>
-            <span>Show Dependencies</span>
-          </label>
-          <label class="filter-checkbox">
             <input type="checkbox" id="show-labels" checked>
             <span>Show Labels</span>
           </label>
