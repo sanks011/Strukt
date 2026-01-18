@@ -2,7 +2,7 @@
   "name": "strukt",
   "displayName": "Strukt - Interactive 3D Project Map",
   "description": "Visualize your workspace as a stunning 3D interactive force-directed graph with 80+ file icons, smart search, and expandable folders",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "sankalpasarkar",
   "author": {
     "name": "Sankalpa Sarkar",
@@ -66,19 +66,27 @@
     "viewsWelcome": [
       {
         "view": "strukt.projectMapView",
-        "contents": "Visualize your project structure in 3D.\n[Open Project Map](command:strukt.openProjectMap)"
+        "contents": "Visualize your project structure in 3D.\n[Open Project Map](command:strukt.openProjectMap)\n[Set up your AI Context](command:strukt.openAIContext)"
       }
     ],
     "commands": [
       {
         "command": "strukt.openProjectMap",
         "title": "Open Project Map",
-        "category": "Strukt"
+        "category": "Strukt",
+        "icon": "$(map)"
       },
       {
         "command": "strukt.refreshProjectMap",
         "title": "Refresh Project Map",
-        "category": "Strukt"
+        "category": "Strukt",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "strukt.openAIContext",
+        "title": "Set up your AI Context",
+        "category": "Strukt",
+        "icon": "$(book)"
       }
     ],
     "configuration": {

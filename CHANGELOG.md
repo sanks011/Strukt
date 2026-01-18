@@ -2,6 +2,35 @@
 
 All notable changes to the "Strukt" extension will be documented in this file.
 
+## [0.4.0] - 2026-01-18
+
+### AI Context Manager
+
+#### New Features
+- Template Management System: Create, edit, delete, and organize AI instruction templates
+- GitHub Copilot Integration: Templates automatically saved to `.github/instructions/` for seamless Copilot integration
+- Path-Specific Instructions: Use glob patterns to apply templates to specific file types or directories
+- Import/Export: Import existing instruction files or share templates
+- User & Workspace Templates: Store personal templates or share with team via version control
+- Frontmatter Support: Add metadata like description and applyTo patterns
+- Live Workspace Detection: See existing instruction files in your workspace
+- Professional UI: Clean, minimal black theme matching Strukt's design language
+
+#### Command & Integration
+- New command: Strukt: Set up your AI Context
+- Accessible from Command Palette and sidebar welcome view
+- Templates persist across VS Code sessions
+- Automatic file creation in `.github/instructions/`
+
+#### Technical Implementation
+- Extension global state for cross-workspace templates
+- Markdown with YAML frontmatter support
+- Glob pattern validation
+- File system integration with error handling
+- Template import/export functionality
+
+---
+
 ## [0.3.0] - 2026-01-18
 
 ### 🎉 Major Feature Release

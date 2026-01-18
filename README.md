@@ -4,15 +4,25 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
 ![Three.js](https://img.shields.io/badge/Three.js-Powered-orange)
 ![3D Force Graph](https://img.shields.io/badge/3D%20Force%20Graph-Visualization-green)
-![Version](https://img.shields.io/badge/version-0.3.0-brightgreen)
+![Version](https://img.shields.io/badge/version-0.4.0-brightgreen)
 
-Visualize your workspace as a stunning **3D interactive force-directed graph** directly in VS Code. Navigate complex project structures with recognizable file/folder icons, advanced filtering, smart search, focus mode, and always-visible dependency connections.
+Visualize your workspace as a stunning 3D interactive force-directed graph and manage AI instruction templates directly in VS Code. Navigate complex project structures with recognizable file/folder icons, advanced filtering, smart search, focus mode, and always-visible dependency connections. Plus, create reusable AI instruction templates that automatically integrate with GitHub Copilot.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🎯 Core Visualization
+### AI Context Manager
+- Template Management - Create, edit, and organize reusable AI instruction templates
+- GitHub Copilot Integration - Templates automatically integrate with Copilot's instruction system
+- Path-Specific Instructions - Use glob patterns to apply templates to specific files
+- Import/Export - Import existing instruction files or export templates
+- Workspace Integration - Templates saved to `.github/instructions/` for team sharing
+- User Templates - Store personal templates that work across all your projects
+- Live Preview - See how your instructions will be applied
+- Zero Configuration - Works out of the box with GitHub Copilot
+
+### Core Visualization
 - **3D Force-Directed Graph** - Beautiful physics-based layout with radial hierarchy
 - **VSCode Icons Integration** - Instantly recognizable file/folder icons via Iconify CDN (1,467+ icons)
 - **Blue Dependency Lines** - Always-visible connection lines showing file/folder relationships
@@ -75,9 +85,24 @@ Visualize your workspace as a stunning **3D interactive force-directed graph** d
 ## 🚀 Usage
 
 ### Basic Usage
-1. **Open Command Palette**: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
-2. **Run Command**: `Strukt: Open Project Map`
-3. **Explore Your Project!**
+1. Open Command Palette: Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (Mac)
+2. For 3D Map: Run Strukt: Open Project Map
+3. For AI Context: Run Strukt: Set up your AI Context
+4. Explore Your Project
+
+### AI Context Manager
+1. Open Command Palette (Ctrl+Shift+P)
+2. Run Strukt: Set up your AI Context
+3. Create templates:
+   - Click "Create New Template"
+   - Give it a name (e.g., "Backend Standards")
+   - Add instructions in Markdown format
+   - Optionally add glob pattern (e.g., `**/*.ts`)
+4. Apply templates:
+   - Select templates with checkboxes
+   - Click "Apply Selected to Workspace"
+   - Files are created in `.github/instructions/`
+5. Templates automatically integrate with GitHub Copilot
 
 ### Advanced Features
 
@@ -165,10 +190,27 @@ Visualize your workspace as a stunning **3D interactive force-directed graph** d
 
 ---
 
-## ⚙️ Commands
+## Commands
 
-- `Strukt: Open Project Map` - Opens the 3D interactive visualization
-- `Strukt: Refresh Project Map` - Manually refresh the visualization
+- Strukt: Open Project Map - Opens the 3D interactive visualization
+- Strukt: Set up your AI Context - Manage AI instruction templates
+- Strukt: Refresh Project Map - Manually refresh the visualization
+
+---
+
+1. **Code Analysis**: Uses TypeScript Compiler API to parse your codebase
+2. **AST Parsing**: Detects imports, exports, classes, functions, interfaces
+3. **Dependency Mapping**: Builds a graph of how files relate to each other
+4. **Module Detection**: Groups files by top-level folders
+5. **C4 Generation**: Creates Mermaid.js C4 diagrams at multiple levels
+6. **Interactive Display**: Renders in a beautiful tabbed interface
+
+### Diagram Levels
+
+- **System Context (Level 1)**: Shows your system and external dependencies (npm packages)
+- **Container (Level 2)**: Shows main modules/folders and their relationships
+- **Component (Level 3)**: Shows individual files and their connections within each module
+- **Overview**: Statistics dashboard with metrics and insights
 
 ---
 
