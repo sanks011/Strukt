@@ -255,20 +255,6 @@ export class ProjectMapProvider {
           </label>
         </div>
       </div>
-      
-      <!-- Display Options -->
-      <div class="filter-section">
-        <div class="section-header" data-section="display">
-          <i data-feather="chevron-down"></i>
-          <span>Display</span>
-        </div>
-        <div class="section-content" id="display-content">
-          <label class="filter-checkbox">
-            <input type="checkbox" id="show-labels" checked>
-            <span>Show Labels</span>
-          </label>
-        </div>
-      </div>
     </div>
   </div>
   

@@ -1063,8 +1063,7 @@
   const filterState = {
     fileTypes: new Set(['js', 'ts', 'json', 'md', 'css', 'html', 'folder']),
     maxDepth: 10,
-    sizeFilter: 'all',
-    showLabels: true
+    sizeFilter: 'all'
   };
 
   // Toggle sidebar
@@ -1091,10 +1090,6 @@
     document.querySelectorAll('input[name="size-filter"]').forEach(cb => {
       cb.checked = cb.value === 'all';
     });
-    
-    // Reset display options
-    filterState.showLabels = true;
-    document.getElementById('show-labels').checked = true;
     
     applyFilters();
   });
@@ -1141,12 +1136,6 @@
         applyFilters();
       }
     });
-  });
-
-  // Display options - Show Labels toggle
-  document.getElementById('show-labels')?.addEventListener('change', (e) => {
-    filterState.showLabels = e.target.checked;
-    // Note: This only affects static labels, hover tooltips remain active via onNodeHover
   });
 
   // Apply filters to graph
