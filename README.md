@@ -1,335 +1,133 @@
-# Strukt - Interactive 3D Project Map
+# Strukt
 
-![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
-![Three.js](https://img.shields.io/badge/Three.js-Powered-orange)
-![3D Force Graph](https://img.shields.io/badge/3D%20Force%20Graph-Visualization-green)
-![Version](https://img.shields.io/badge/version-0.4.0-brightgreen)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue)](https://marketplace.visualstudio.com/items?itemName=strukt)
+[![VS Code](https://img.shields.io/badge/VS%20Code-1.80+-brightgreen)](https://code.visualstudio.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 
-Visualize your workspace as a stunning 3D interactive force-directed graph and manage AI instruction templates directly in VS Code. Navigate complex project structures with recognizable file/folder icons, advanced filtering, smart search, focus mode, and always-visible dependency connections. Plus, create reusable AI instruction templates that automatically integrate with GitHub Copilot.
+**Professional 3D project visualization and AI context management for Visual Studio Code.**
+
+Strukt transforms your workspace into an interactive 3D force-directed graph, enabling intuitive navigation through complex codebases. Includes integrated AI context management for GitHub Copilot, with reusable instruction templates that enhance your development workflow.
 
 ---
 
 ## Features
 
 ### AI Context Manager
-- Template Management - Create, edit, and organize reusable AI instruction templates
-- GitHub Copilot Integration - Templates automatically integrate with Copilot's instruction system
-- Path-Specific Instructions - Use glob patterns to apply templates to specific files
-- Import/Export - Import existing instruction files or export templates
-- Workspace Integration - Templates saved to `.github/instructions/` for team sharing
-- User Templates - Store personal templates that work across all your projects
-- Live Preview - See how your instructions will be applied
-- Zero Configuration - Works out of the box with GitHub Copilot
 
-### Core Visualization
-- **3D Force-Directed Graph** - Beautiful physics-based layout with radial hierarchy
-- **VSCode Icons Integration** - Instantly recognizable file/folder icons via Iconify CDN (1,467+ icons)
-- **Blue Dependency Lines** - Always-visible connection lines showing file/folder relationships
-- **Layer-by-Layer Expansion** - Click folders to expand/collapse, exploring your project naturally
-- **Real-time Sync** - Automatically updates when files/folders change
-- **Smooth Animations** - Buttery-smooth 60fps rendering with Three.js
+Create and manage reusable AI instruction templates that automatically integrate with GitHub Copilot:
 
-### 🎛️ Advanced Filtering Sidebar
-- **Sleek Collapsible Panel** - Professional gradient sidebar with smooth animations
-- **File Type Filters** - Show/hide specific file types (JS, TS, JSON, MD, CSS, HTML, Folders)
-- **Depth Control** - Adjustable slider (1-10 levels) to control visualization complexity
-- **Size Filters** - Filter by file size: Small (<10KB), Medium (10-100KB), Large (>100KB)
-- **Real-time Updates** - Filters apply instantly without page refresh
-- **Clear All** - Reset all filters to defaults with one click
-- **Collapsible Sections** - Organized filter categories for clean UI
+- **Template Management** - Create, edit, and organize AI instruction templates
+- **GitHub Copilot Integration** - Automatic integration with Copilot's instruction system
+- **Path-Specific Instructions** - Apply templates to specific files using glob patterns
+- **Import/Export** - Import existing instruction files or export templates
+- **Team Collaboration** - Templates saved to `.github/instructions/` for team sharing
 
-### 🎯 Focus Mode
-- **Isolate Folders** - Ctrl+Click any folder to focus on its contents exclusively
-- **Breadcrumb Navigation** - Interactive breadcrumb showing your focus path
-- **Quick Navigation** - Click any breadcrumb level to jump back
-- **Exit Focus** - One-click button to return to full project view
-- **Focus Stack** - Navigate through multiple folder levels seamlessly
+### 3D Project Visualization
 
-### 🔍 Smart Search
-- **Live Search** - Type to find files instantly (2+ characters)
-- **Visual Highlighting** - Matched files stay bright while others fade to 15% opacity
-- **Auto-Focus** - Camera automatically centers on search results
-- **Connection Dimming** - Links fade to show only relevant connections
+Navigate your codebase through an interactive 3D force-directed graph:
 
-### 🎨 Visual Polish
-- **Ultra-Thin Blue Edges** - Professional 0.5px blue lines for clean aesthetics
-- **File Type Recognition** - 80+ file types with proper icons (JS, TS, Python, CSS, images, fonts, etc.)
-- **Folder Type Intelligence** - Recognizes common folders (src, components, tests, assets, dist, etc.)
-- **File Extension Badges** - Hover to see file type badges (TS, MD, CSV, etc.)
-- **Animated Background** - Subtle particles.js-style background with colored particles
+- **Force-Directed Layout** - Physics-based visualization with radial hierarchy
+- **VSCode Icons** - Recognizable file and folder icons
+- **Dependency Visualization** - Clear connection lines showing file relationships
+- **Layer Expansion** - Explore project structure hierarchically
+- **Real-time Sync** - Automatic updates when files change
 
-### 🖱️ Interaction
-- **Click Files** - Opens in VS Code editor
-- **Click Folders** - Toggles expansion
-- **Ctrl+Click Folders** - Activates Focus Mode
-- **Drag Nodes** - Repositions nodes in 3D space
-- **Zoom & Pan** - Mouse wheel to zoom, drag to rotate
-- **Breadcrumb Path** - Shows current hover location and focus navigation
+### Advanced Navigation
 
-### 📊 Rich Tooltips
-- **File Metadata** - Size, file count, path
-- **Extension Badge** - Quick file type identification
-- **Expansion Status** - Shows if folder is expanded/collapsed
-- **Clean Design** - Professional, emoji-free tooltips
+- **File Type Filters** - Show or hide specific file types
+- **Depth Control** - Adjustable visualization complexity (1-10 levels)
+- **Size Filters** - Filter by file size categories
+- **Focus Mode** - Isolate and examine specific folders (Ctrl+Click)
+- **Smart Search** - Live search with visual highlighting
+- **Breadcrumb Navigation** - Track your current location and focus path
 
-### 🎛️ Controls
-- **Filter Sidebar** - Toggle button with gradient blue design
-- **Fit to Screen** - Centers and scales entire project
-- **Reset View** - Returns to default camera position
-- **Search Bar** - Live file search with clear button
-- **Dark/Light Theme** - Automatically matches VS Code theme
+### Interaction
+
+- Click files to open in editor
+- Click folders to expand or collapse
+- Ctrl+Click folders to activate Focus Mode
+- Drag nodes to reposition in 3D space
+- Mouse wheel to zoom, drag to rotate view
 
 ---
 
-## 🚀 Usage
+## Usage
 
-### Basic Usage
-1. Open Command Palette: Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (Mac)
-2. For 3D Map: Run Strukt: Open Project Map
-3. For AI Context: Run Strukt: Set up your AI Context
-4. Explore Your Project
+### Opening Strukt
+
+Open Command Palette: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
+
+- **3D Project Map**: Run `Strukt: Open Project Map`
+- **AI Context Manager**: Run `Strukt: Set up your AI Context`
 
 ### AI Context Manager
-1. Open Command Palette (Ctrl+Shift+P)
-2. Run Strukt: Set up your AI Context
-3. Create templates:
-   - Click "Create New Template"
-   - Give it a name (e.g., "Backend Standards")
-   - Add instructions in Markdown format
-   - Optionally add glob pattern (e.g., `**/*.ts`)
-4. Apply templates:
-   - Select templates with checkboxes
-   - Click "Apply Selected to Workspace"
-   - Files are created in `.github/instructions/`
-5. Templates automatically integrate with GitHub Copilot
 
-### Advanced Features
+1. Open Command Palette and run `Strukt: Set up your AI Context`
+2. Click "Create New Template"
+3. Enter template name and instructions in Markdown format
+4. Optionally specify glob pattern for automatic application (e.g., `**/*.ts`)
+5. Select templates and click "Apply Selected to Workspace"
+6. Templates are created in `.github/instructions/` and automatically integrate with GitHub Copilot
 
-#### Using Filters
-1. Click the **blue filter icon** on the right edge to open the sidebar
-2. **File Type Filters**: Uncheck file types to hide them (e.g., hide .md files)
-3. **Depth Slider**: Drag to limit folder depth (1-10 levels)
-4. **Size Filters**: Filter by file size categories
-5. **Clear All**: Reset filters instantly
+### 3D Project Map
 
-#### Focus Mode
-1. Hold **Ctrl** (or **Cmd** on Mac)
-2. **Click any folder** to focus on its contents
-3. **Breadcrumb appears** at the bottom showing your path
-4. **Click breadcrumb levels** to navigate back
-5. **Exit Focus** button to return to full view
+**Filters**: Click the filter icon to access file type, depth, and size filters
 
-#### Search
-1. Type in the **search bar** (top controls)
-2. Results **highlight automatically**
-3. Non-matching files **fade to 15% opacity**
-4. **Clear button** to reset search
+**Focus Mode**: Hold Ctrl (Cmd on Mac) and click any folder to isolate its contents
+
+**Search**: Type in the search bar to highlight matching files
+
+**Navigation**: Use breadcrumbs to track location and navigate between focus levels
 
 ---
 
-## 🎨 What Makes Strukt Different?
+## Supported File Types
 
-### Before Strukt:
-- ❌ Static text-based file trees
-- ❌ No visual hierarchy understanding
-- ❌ Hard to find files in large projects
-- ❌ No spatial memory of project layout
-- ❌ Can't filter or focus easily
+**Languages**: JavaScript, TypeScript, Python, Java, C/C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Scala, Dart, Lua, R
 
-### With Strukt:
-- ✅ **3D spatial visualization** - See your entire project at once
-- ✅ **Advanced filtering** - Show only what matters
-- ✅ **Focus mode** - Isolate specific folders instantly
-- ✅ **Blue dependency lines** - Always visible connections
-- ✅ **VSCode-familiar icons** - Same icons you see in the file explorer
-- ✅ **Smart search dimming** - Only see matching results
-- ✅ **Expandable folders** - Explore layer by layer
-- ✅ **Instant file opening** - Click to open, no navigation needed
-- ✅ **Beautiful aesthetics** - Professional, sleek design
+**Web**: HTML, CSS, SCSS, SASS, LESS, Vue, Svelte, React (JSX/TSX)
 
----
+**Data**: JSON, YAML, TOML, XML, CSV, TSV, SQL
 
-## 🎨 What Makes Strukt Different?
+**Images**: PNG, JPG, JPEG, GIF, WEBP, SVG, ICO, BMP, TIFF
 
-### Before Strukt:
-- ❌ Static text-based file trees
-- ❌ No visual hierarchy understanding
-- ❌ Hard to find files in large projects
-- ❌ No spatial memory of project layout
+**Documents**: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, Markdown
 
-### With Strukt:
-- ✅ **3D spatial visualization** - See your entire project at once
-- ✅ **VSCode-familiar icons** - Same icons you see in the file explorer
-- ✅ **Smart search dimming** - Only see what matters
-- ✅ **Expandable folders** - Explore layer by layer, not all at once
-- ✅ **Instant file opening** - Click to open, no navigation needed
-- ✅ **Beautiful aesthetics** - Professional, sleek design
+**Configuration**: .env, .gitignore, .npmrc, .editorconfig, .prettierrc, Dockerfile, Makefile
 
----
+**Archives**: ZIP, RAR, TAR, GZ, 7Z
 
-## 🖼️ File Type Support
+**Media**: MP4, AVI, MOV, MP3, WAV
 
-**80+ file types supported** including:
-
-- **Languages**: JavaScript (js, jsx, mjs, cjs), TypeScript (ts, tsx), Python, Java, C/C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Scala, Dart, Lua, R
-- **Web**: HTML, CSS, SCSS, SASS, LESS
-- **Data**: JSON, YAML, TOML, XML, CSV, TSV, SQL
-- **Images**: PNG, JPG, JPEG, GIF, WEBP, SVG, ICO, BMP, TIFF
-- **Fonts**: TTF, OTF, WOFF, WOFF2, EOT
-- **Documents**: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX
-- **Archives**: ZIP, RAR, TAR, GZ, 7Z
-- **Media**: MP4, AVI, MOV, MP3, WAV
-- **Config**: .env, .gitignore, .npmrc, .editorconfig, .prettierrc, Dockerfile, Makefile
-- **Frameworks**: Vue, Svelte, React (JSX/TSX)
-- **Notebooks**: Jupyter (.ipynb)
-- **Shell**: Bash, Zsh, PowerShell
-
-**40+ folder types recognized**:
-- `src`, `dist`, `build`, `public`, `components`, `config`, `test`, `tests`, `assets`, `images`, `styles`, `css`, `docs`, `utils`, `helpers`, `lib`, `api`, `server`, `backend`, `node_modules`, `.github`, `.vscode`, `.git`, and more!
+Recognizes 40+ common folder types including `src`, `dist`, `build`, `components`, `config`, `test`, `assets`, `node_modules`, `.github`, `.vscode`, and more.
 
 ---
 
 ## Commands
 
-- Strukt: Open Project Map - Opens the 3D interactive visualization
-- Strukt: Set up your AI Context - Manage AI instruction templates
-- Strukt: Refresh Project Map - Manually refresh the visualization
+- `Strukt: Open Project Map` - Open 3D project visualization
+- `Strukt: Set up your AI Context` - Manage AI instruction templates
+- `Strukt: Refresh Project Map` - Refresh visualization
 
----
-
-1. **Code Analysis**: Uses TypeScript Compiler API to parse your codebase
-2. **AST Parsing**: Detects imports, exports, classes, functions, interfaces
-3. **Dependency Mapping**: Builds a graph of how files relate to each other
-4. **Module Detection**: Groups files by top-level folders
-5. **C4 Generation**: Creates Mermaid.js C4 diagrams at multiple levels
-6. **Interactive Display**: Renders in a beautiful tabbed interface
-
-### Diagram Levels
-
-- **System Context (Level 1)**: Shows your system and external dependencies (npm packages)
-- **Container (Level 2)**: Shows main modules/folders and their relationships
-- **Component (Level 3)**: Shows individual files and their connections within each module
-- **Overview**: Statistics dashboard with metrics and insights
-
----
-
-## 🛠️ Development
-
-```bash
-# Install dependencies
-npm install
-
-# Compile and watch for changes
-npm run watch
-
-# Run extension in development mode
-# Press F5 in VS Code to launch Extension Development Host
-
-# Build for production
-npm run compile
-
-# Package extension
-npx @vscode/vsce package
-```
-
----
-
-## 🏗️ Tech Stack
+## Technical Stack
 
 - **VS Code Extension API** - Extension framework
 - **TypeScript** - Type-safe development
 - **Three.js** - 3D rendering engine
 - **3D Force Graph** - Force-directed graph layout
-- **Iconify API** - 275k+ icons (VSCode Icons collection)
-- **particles.js** - Animated background
+- **Iconify API** - VSCode icon collection
 - **esbuild** - Fast bundling
 
 ---
 
-## 📦 Project Structure
-
-```
-strukt/
-├── src/
-│   ├── extension.ts          # Main extension entry
-│   ├── fileSystemWatcher.ts  # File system monitoring
-│   ├── treeBuilder.ts        # File tree construction
-│   └── webviewProvider.ts    # Webview management
-├── media/
-│   ├── main.js               # 3D graph logic
-│   └── style.css             # Webview styles
-├── dist/                     # Compiled output
-└── package.json              # Extension manifest
-```
-
----
-
-## 🎯 Roadmap
-
-- [x] ~~Git status integration (modified/untracked files)~~
-- [x] ~~Advanced filtering options~~
-- [x] ~~Focus mode for folder isolation~~
-- [x] ~~Dependency visualization~~
-- [ ] Export project map as image (PNG/SVG)
-- [ ] Custom color schemes
-- [ ] File size heatmap visualization
-- [ ] Recently modified files highlighting
-- [ ] Save/restore camera position
-- [ ] Multi-workspace support
-- [ ] Performance metrics overlay
-- [ ] Keyboard shortcuts
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
+## License
 
 MIT License - see LICENSE file for details
 
 ---
 
-## 👨‍💻 Creator
+## Author
 
 **Sankalpa Sarkar**
 
-- 🌐 LinkedIn: [linkedin.com/in/sankalpacodes](https://www.linkedin.com/in/sankalpacodes)
-- 💻 GitHub: [@sanks011](https://github.com/sanks011)
-- 📧 Email: sankalpasarkar68@outlook.com
-- 📸 Instagram: [@kyunsankalpa](https://instagram.com/kyunsankalpa)
-- 🐦 Twitter/X: [@sarkar7522](https://twitter.com/sarkar7522)
-
----
-
-## 🙏 Credits
-
-- **Iconify** - Icon framework with VSCode Icons collection
-- **3D Force Graph** - Force-directed graph visualization
-- **Three.js** - 3D rendering engine
-- **particles.js** - Background animations
-- **VS Code Extension API** - Extension framework
-
----
-
-## ⭐ Support
-
-If you find Strukt useful, please consider:
-- ⭐ Starring the repository
-- 🐛 Reporting bugs via GitHub Issues
-- 💡 Suggesting features
-- 📢 Sharing with other developers
-
----
-
-**Made with ❤️ for developers who love visual understanding**
+[LinkedIn](https://www.linkedin.com/in/sankalpacodes) | [GitHub](https://github.com/sanks011) | [Email](mailto:sankalpasarkar68@outlook.com)
