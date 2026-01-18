@@ -2,6 +2,49 @@
 
 All notable changes to the "Strukt" extension will be documented in this file.
 
+## [0.3.0] - 2026-01-18
+
+### 🎉 Major Feature Release
+
+#### New Features
+- **Advanced Filter Sidebar**: Professional collapsible panel with smooth animations
+  - File Type Filters: Show/hide JS, TS, JSON, MD, CSS, HTML, and Folders
+  - Depth Control: Adjustable slider (1-10 levels) to control visualization depth
+  - Size Filters: Filter by Small (<10KB), Medium (10-100KB), Large (>100KB)
+  - Real-time Updates: Filters apply instantly without refresh
+  - Clear All button: Reset all filters to defaults
+  - Collapsible Sections: Organized filter categories
+  - Gradient blue design with smooth slide animations
+
+- **Focus Mode**: Isolate and explore specific folders
+  - Ctrl+Click any folder to focus on its contents exclusively
+  - Interactive breadcrumb navigation showing your focus path
+  - Click breadcrumb levels to navigate back through folders
+  - Exit Focus button to return to full project view
+  - Focus stack tracks navigation history
+
+- **Always-Visible Dependency Lines**: 
+  - Beautiful blue connection lines (rgba(74, 158, 255, 0.3))
+  - 0.5px professional thickness
+  - Permanent visibility showing file/folder relationships
+  - Smart opacity during search highlighting
+
+#### Improvements
+- Enhanced UI/UX with research-backed best practices
+- Removed unnecessary toggles for cleaner interface
+- Improved breadcrumb styling with interactive navigation
+- Better filter organization and visual hierarchy
+- Professional gradient sidebar design
+- Optimized real-time filtering performance
+
+#### Technical
+- Implemented Microsoft Visual Studio Code Map patterns
+- Applied enterprise UX best practices for filtering
+- Improved graph visualization controls
+- Enhanced keyboard and mouse interaction handling
+
+---
+
 ## [0.1.0] - 2026-01-17
 
 ### Initial Release 🎉
@@ -17,9 +60,9 @@ All notable changes to the "Strukt" extension will be documented in this file.
 - **Particle Background**: Beautiful animated particle effect for enhanced visuals
 - **Activity Bar Integration**: Quick access via sidebar icon
 - **File Opening**: Click any node to open the file directly in editor
-- **Ultra-thin Connections**: Sleek 0.3px connection lines for clean visualization
+- **Ultra-thin Connections**: Sleek connection lines for clean visualization
 - **Configurable**: 
-  - Adjustable max depth (default: 5 levels)
+  - Adjustable max depth (default: 10 levels)
   - Exclude patterns (node_modules, .git, dist, out, build)
   - Node size based on file size
   - Color-coded by file type
@@ -39,9 +82,8 @@ Configuration files, and many more!
 ---
 
 ### Future Roadmap
-- Git integration (show modified/untracked files)
-- Advanced filtering options
-- Keyboard navigation
-- Minimap for large projects
 - Export visualization as image
 - Custom color themes
+- Keyboard navigation shortcuts
+- Minimap for large projects
+- Performance metrics overlay
