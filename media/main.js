@@ -352,6 +352,11 @@
       scale = Math.max(8, Math.min(25, size / 2000));
     }
     
+    // Add glow effect for Git-modified files - CRAZY VISIBLE!
+    if (node.gitStatus) {
+      scale = scale * 1.5; // Make Git files 50% larger
+    }
+    
     sprite.scale.set(scale, scale, 1);
     
     // Store sprite reference on node for opacity updates during search
@@ -964,6 +969,35 @@
     });
   }
 
+  // Count Git status files
+  function countGitStatus(tree) {
+    const counts = { modified: 0, untracked: 0, staged: 0, deleted: 0 };
+    
+    function traverse(node) {
+      if (node.gitStatus) {
+        counts[node.gitStatus]++;
+      }
+      if (node.children) {
+        node.children.forEach(traverse);
+      }
+    }
+    
+    traverse(tree);
+    return counts;
+  }
+
+  // Update Git panel
+  function updateGitPanel(tree) {
+    const counts = countGitStatus(tree);
+    
+    document.getElementById('git-modified').textContent = counts.modified;
+    document.getElementById('git-untracked').textContent = counts.untracked;
+    document.getElementById('git-staged').textContent = counts.staged;
+    document.getElementById('git-deleted').textContent = counts.deleted;
+    
+    console.log('[Strukt UI] Git counts:', counts);
+  }
+
   // Update graph
   function updateGraph(tree) {
     if (!graph) return;
@@ -972,12 +1006,49 @@
     const { nodes, links } = treeToGraph(tree);
 
     graph.graphData({ nodes, links });
-    updateStatistics(tree);
 
     setTimeout(() => {
       graph.d3ReheatSimulation();
     }, 100);
   }
+
+
+  // Git highlight toggle
+  let gitHighlightEnabled = true;
+  
+  document.getElementById('toggle-git-highlight')?.addEventListener('click', function() {
+    gitHighlightEnabled = !gitHighlightEnabled;
+    this.classList.toggle('active');
+    
+    if (graph) {
+      const graphData = graph.graphData();
+      graphData.nodes.forEach(node => {
+        if (node.gitStatus && !gitHighlightEnabled) {
+          // Dim git-highlighted nodes
+          if (node.__sprite) {
+            node.__sprite.material.opacity = 0.3;
+          }
+        } else {
+          // Restore
+          if (node.__sprite) {
+            node.__sprite.material.opacity = 0.9;
+          }
+        }
+      });
+    }
+  });
+
+  // Toggle Git panel
+  document.getElementById('toggle-git-panel')?.addEventListener('click', function() {
+    const panel = document.querySelector('.git-content');
+    if (panel.style.display === 'none') {
+      panel.style.display = 'flex';
+      this.textContent = '−';
+    } else {
+      panel.style.display = 'none';
+      this.textContent = '+';
+    }
+  });
 
   // Event handlers
   document.getElementById('fit')?.addEventListener('click', () => {

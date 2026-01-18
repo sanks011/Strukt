@@ -164,39 +164,6 @@ export class ProjectMapProvider {
   
   <div id="breadcrumb"></div>
   
-  <div id="stats-panel">
-    <div class="stats-header">
-      <h3><i data-feather="bar-chart-2"></i> Project Stats</h3>
-      <button id="toggle-stats" title="Toggle stats">−</button>
-    </div>
-    <div class="stats-content">
-      <div class="stat-item">
-        <span class="stat-label"><i data-feather="file-text"></i> Files:</span>
-        <span class="stat-value" id="total-files">0</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label"><i data-feather="folder"></i> Folders:</span>
-        <span class="stat-value" id="total-folders">0</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label"><i data-feather="database"></i> Total Size:</span>
-        <span class="stat-value" id="total-size">0 B</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label"><i data-feather="layers"></i> Max Depth:</span>
-        <span class="stat-value" id="deepest-level">0</span>
-      </div>
-      <div class="stat-section">
-        <h4><i data-feather="list"></i> File Types</h4>
-        <ul id="file-types"></ul>
-      </div>
-      <div class="stat-section">
-        <h4><i data-feather="trending-up"></i> Largest Files</h4>
-        <ul id="largest-files"></ul>
-      </div>
-    </div>
-  </div>
-  
   <div id="cy"></div>
   
   <script nonce="${nonce}">
