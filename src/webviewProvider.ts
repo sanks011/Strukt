@@ -164,6 +164,118 @@ export class ProjectMapProvider {
   
   <div id="breadcrumb"></div>
   
+  <!-- Filter Sidebar -->
+  <div id="filter-sidebar" class="collapsed">
+    <button id="toggle-sidebar" title="Toggle Filters">
+      <i data-feather="sliders"></i>
+    </button>
+    
+    <div class="sidebar-content">
+      <div class="sidebar-header">
+        <h3><i data-feather="filter"></i> Filters</h3>
+        <button id="clear-filters" title="Clear All Filters">
+          <i data-feather="refresh-cw"></i> Reset
+        </button>
+      </div>
+      
+      <!-- File Type Filter -->
+      <div class="filter-section">
+        <div class="section-header" data-section="file-types">
+          <i data-feather="chevron-down"></i>
+          <span>File Types</span>
+        </div>
+        <div class="section-content" id="file-types-content">
+          <label class="filter-checkbox">
+            <input type="checkbox" value="js" checked>
+            <span>JavaScript (.js)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="ts" checked>
+            <span>TypeScript (.ts)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="json" checked>
+            <span>JSON (.json)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="md" checked>
+            <span>Markdown (.md)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="css" checked>
+            <span>CSS (.css)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="html" checked>
+            <span>HTML (.html)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="folder" checked>
+            <span>Folders</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Depth Filter -->
+      <div class="filter-section">
+        <div class="section-header" data-section="depth">
+          <i data-feather="chevron-down"></i>
+          <span>Depth Level</span>
+        </div>
+        <div class="section-content" id="depth-content">
+          <div class="slider-control">
+            <label>Max Depth: <span id="depth-value">10</span></label>
+            <input type="range" id="depth-slider" min="1" max="10" value="10" step="1">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Size Filter -->
+      <div class="filter-section">
+        <div class="section-header" data-section="size">
+          <i data-feather="chevron-down"></i>
+          <span>File Size</span>
+        </div>
+        <div class="section-content" id="size-content">
+          <label class="filter-checkbox">
+            <input type="checkbox" name="size-filter" value="all" checked>
+            <span>All Sizes</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" name="size-filter" value="small">
+            <span>Small (&lt; 10 KB)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" name="size-filter" value="medium">
+            <span>Medium (10-100 KB)</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" name="size-filter" value="large">
+            <span>Large (&gt; 100 KB)</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Display Options -->
+      <div class="filter-section">
+        <div class="section-header" data-section="display">
+          <i data-feather="chevron-down"></i>
+          <span>Display</span>
+        </div>
+        <div class="section-content" id="display-content">
+          <label class="filter-checkbox">
+            <input type="checkbox" id="show-dependencies" checked>
+            <span>Show Dependencies</span>
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" id="show-labels" checked>
+            <span>Show Labels</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <div id="cy"></div>
   
   <script nonce="${nonce}">

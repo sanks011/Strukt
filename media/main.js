@@ -501,10 +501,15 @@
         })
         .nodeResolution(24)
         
-        // Simple, clean connecting lines - NO particles, NO animations
-        .linkColor(() => 'rgba(255, 255, 255, 0.2)') // Clean white lines, more subtle
-        .linkWidth(0.3) // Ultra thin, sleek lines
+        // Simple, clean connecting lines with dependency visibility control
+        .linkColor(link => {
+          if (!filterState.showDependencies) return 'rgba(255, 255, 255, 0)'; // Hidden
+          return 'rgba(74, 158, 255, 0.3)'; // Visible blue lines
+        })
+        .linkWidth(link => filterState.showDependencies ? 0.5 : 0)
         .linkOpacity(link => {
+          if (!filterState.showDependencies) return 0;
+          
           // Fade links during search if neither node is highlighted
           const graphData = graph ? graph.graphData() : null;
           const hasHighlights = graphData && graphData.nodes.some(n => n.highlighted);
@@ -512,15 +517,15 @@
           if (hasHighlights) {
             const sourceHighlighted = link.source.highlighted;
             const targetHighlighted = link.target.highlighted;
-            return (sourceHighlighted || targetHighlighted) ? 0.3 : 0.05;
+            return (sourceHighlighted || targetHighlighted) ? 0.4 : 0.05;
           }
-          return 0.3;
+          return 0.4;
         })
         .linkDirectionalParticles(0) // NO particles - clean and simple
         .linkDirectionalParticleSpeed(0)
         .linkDirectionalParticleWidth(0)
         
-        .onNodeClick(node => {
+        .onNodeClick((node, event) => {
           console.log('Node clicked:', node);
           
           if (!node) {
@@ -532,7 +537,14 @@
           const isFolder = node.type === 'directory' || (node.children !== undefined);
           
           if (isFolder) {
-            // It's a folder - toggle expand/collapse
+            // Ctrl+Click = Focus Mode
+            if (event && (event.ctrlKey || event.metaKey)) {
+              console.log('Focus mode activated for:', node.path);
+              focusOnFolder(node);
+              return;
+            }
+            
+            // Regular click - toggle expand/collapse
             console.log('Toggling folder:', node.path);
             toggleFolderExpansion(node);
           } else {
@@ -1049,6 +1061,304 @@
       this.textContent = '+';
     }
   });
+
+  // ============ FILTER SIDEBAR FUNCTIONALITY ============
+  
+  // Filter state
+  const filterState = {
+    fileTypes: new Set(['js', 'ts', 'json', 'md', 'css', 'html', 'folder']),
+    maxDepth: 10,
+    sizeFilter: 'all',
+    showDependencies: true,
+    showLabels: true
+  };
+
+  // Toggle sidebar
+  document.getElementById('toggle-sidebar')?.addEventListener('click', () => {
+    const sidebar = document.getElementById('filter-sidebar');
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // Clear all filters
+  document.getElementById('clear-filters')?.addEventListener('click', () => {
+    // Reset file types
+    filterState.fileTypes = new Set(['js', 'ts', 'json', 'md', 'css', 'html', 'folder']);
+    document.querySelectorAll('#file-types-content input[type="checkbox"]').forEach(cb => {
+      cb.checked = true;
+    });
+    
+    // Reset depth
+    filterState.maxDepth = 10;
+    document.getElementById('depth-slider').value = 10;
+    document.getElementById('depth-value').textContent = 10;
+    
+    // Reset size
+    filterState.sizeFilter = 'all';
+    document.querySelectorAll('input[name="size-filter"]').forEach(cb => {
+      cb.checked = cb.value === 'all';
+    });
+    
+    // Reset display options
+    filterState.showDependencies = true;
+    filterState.showLabels = true;
+    document.getElementById('show-dependencies').checked = true;
+    document.getElementById('show-labels').checked = true;
+    
+    applyFilters();
+  });
+
+  // Section collapse/expand
+  document.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.classList.toggle('collapsed');
+      const content = header.nextElementSibling;
+      content.classList.toggle('hidden');
+    });
+  });
+
+  // File type filters
+  document.querySelectorAll('#file-types-content input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (e.target.checked) {
+        filterState.fileTypes.add(value);
+      } else {
+        filterState.fileTypes.delete(value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Depth slider
+  document.getElementById('depth-slider')?.addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    filterState.maxDepth = value;
+    document.getElementById('depth-value').textContent = value;
+    applyFilters();
+  });
+
+  // Size filters
+  document.querySelectorAll('input[name="size-filter"]').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        // Uncheck others
+        document.querySelectorAll('input[name="size-filter"]').forEach(cb => {
+          if (cb !== e.target) cb.checked = false;
+        });
+        filterState.sizeFilter = e.target.value;
+        applyFilters();
+      }
+    });
+  });
+
+  // Display options
+  document.getElementById('show-dependencies')?.addEventListener('change', (e) => {
+    filterState.showDependencies = e.target.checked;
+    // Update link visibility
+    if (graph) {
+      graph.linkColor(link => filterState.showDependencies ? 'rgba(74, 158, 255, 0.3)' : 'rgba(255, 255, 255, 0)');
+      graph.linkWidth(filterState.showDependencies ? 0.5 : 0);
+    }
+  });
+
+  document.getElementById('show-labels')?.addEventListener('change', (e) => {
+    filterState.showLabels = e.target.checked;
+    // Toggle node labels visibility
+    if (graph) {
+      graph.nodeLabel(filterState.showLabels ? nodeLabel : () => '');
+    }
+  });
+
+  // Apply filters to graph
+  function applyFilters() {
+    if (!graph || !currentTree) return;
+    
+    console.log('[Strukt] Applying filters:', filterState);
+    
+    // Filter the tree data
+    const filteredData = filterTree(currentTree);
+    
+    // Convert to graph format
+    const { nodes, links } = treeToGraph(filteredData);
+    
+    // Update graph
+    graph.graphData({ nodes, links });
+    
+    // Reheat simulation
+    setTimeout(() => {
+      graph.d3ReheatSimulation();
+    }, 100);
+  }
+
+  // Filter tree based on current filter state
+  function filterTree(node, depth = 0) {
+    if (!node) return null;
+    
+    // Check depth limit
+    if (depth > filterState.maxDepth) return null;
+    
+    // Check file type
+    const isFolder = node.children && node.children.length > 0;
+    const ext = node.name.split('.').pop().toLowerCase();
+    
+    if (isFolder) {
+      if (!filterState.fileTypes.has('folder')) return null;
+    } else {
+      if (!filterState.fileTypes.has(ext)) return null;
+    }
+    
+    // Check file size
+    if (!isFolder && filterState.sizeFilter !== 'all') {
+      const sizeKB = (node.size || 0) / 1024;
+      if (filterState.sizeFilter === 'small' && sizeKB >= 10) return null;
+      if (filterState.sizeFilter === 'medium' && (sizeKB < 10 || sizeKB >= 100)) return null;
+      if (filterState.sizeFilter === 'large' && sizeKB < 100) return null;
+    }
+    
+    // Create filtered node
+    const filteredNode = { ...node };
+    
+    // Recursively filter children
+    if (node.children) {
+      filteredNode.children = node.children
+        .map(child => filterTree(child, depth + 1))
+        .filter(child => child !== null);
+      
+      // If folder has no visible children after filtering, hide it
+      if (filteredNode.children.length === 0) return null;
+    }
+    
+    return filteredNode;
+  }
+
+  // ============ FOCUS MODE FUNCTIONALITY ============
+  
+  let focusedNode = null;
+  const focusStack = []; // For breadcrumb navigation
+
+  // Focus on a specific folder (isolate its contents)
+  function focusOnFolder(node) {
+    if (!node || !node.children) {
+      console.warn('[Strukt] Cannot focus on non-folder node');
+      return;
+    }
+    
+    console.log('[Strukt] Focusing on folder:', node.name);
+    
+    // Add to focus stack for breadcrumb navigation
+    if (!focusedNode) {
+      focusStack.push({ name: 'Root', node: currentTree });
+    }
+    focusStack.push({ name: node.name, node: node });
+    
+    // Set focused node
+    focusedNode = node;
+    
+    // Update graph with focused tree
+    updateFocusedGraph();
+    
+    // Update breadcrumb
+    updateFocusBreadcrumb();
+  }
+
+  // Exit focus mode (go back one level)
+  function exitFocus() {
+    if (focusStack.length === 0) return;
+    
+    focusStack.pop(); // Remove current
+    
+    if (focusStack.length === 0) {
+      // Back to root
+      focusedNode = null;
+      updateGraph(currentTree);
+    } else {
+      // Go to parent
+      focusedNode = focusStack[focusStack.length - 1].node;
+      updateFocusedGraph();
+    }
+    
+    updateFocusBreadcrumb();
+  }
+
+  // Navigate to specific level in focus stack
+  function navigateToFocusLevel(index) {
+    if (index < 0 || index >= focusStack.length) return;
+    
+    // Remove all levels after the target
+    focusStack.splice(index + 1);
+    
+    if (index === 0) {
+      focusedNode = null;
+      updateGraph(currentTree);
+    } else {
+      focusedNode = focusStack[index].node;
+      updateFocusedGraph();
+    }
+    
+    updateFocusBreadcrumb();
+  }
+
+  // Update graph with focused tree
+  function updateFocusedGraph() {
+    if (!graph || !focusedNode) return;
+    
+    console.log('[Strukt] Updating focused graph');
+    
+    // Convert focused node to graph format
+    const { nodes, links } = treeToGraph(focusedNode);
+    
+    // Update graph
+    graph.graphData({ nodes, links });
+    
+    // Reheat simulation
+    setTimeout(() => {
+      graph.d3ReheatSimulation();
+    }, 100);
+  }
+
+  // Update breadcrumb to show focus path
+  function updateFocusBreadcrumb() {
+    const breadcrumb = document.getElementById('breadcrumb');
+    if (!breadcrumb) return;
+    
+    if (focusStack.length === 0) {
+      breadcrumb.style.display = 'none';
+      return;
+    }
+    
+    breadcrumb.style.display = 'block';
+    
+    // Build breadcrumb HTML with navigation
+    const crumbs = focusStack.map((item, index) => {
+      const isLast = index === focusStack.length - 1;
+      return `<span class="breadcrumb-item ${isLast ? 'active' : ''}" data-index="${index}">${item.name}</span>`;
+    }).join('<span class="breadcrumb-separator">›</span>');
+    
+    breadcrumb.innerHTML = crumbs + ' <button id="exit-focus" title="Exit Focus Mode"><i data-feather="x-circle"></i></button>';
+    
+    // Replace feather icons
+    if (typeof feather !== 'undefined') feather.replace();
+    
+    // Add click handlers for breadcrumb navigation
+    breadcrumb.querySelectorAll('.breadcrumb-item').forEach((item, index) => {
+      if (!item.classList.contains('active')) {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => navigateToFocusLevel(index));
+      }
+    });
+    
+    // Exit focus button
+    document.getElementById('exit-focus')?.addEventListener('click', () => {
+      focusStack.length = 0;
+      focusedNode = null;
+      updateGraph(currentTree);
+      breadcrumb.style.display = 'none';
+    });
+  }
+
+  // ============ END FOCUS MODE FUNCTIONALITY ============
+
+  // ============ END FILTER FUNCTIONALITY ============
 
   // Event handlers
   document.getElementById('fit')?.addEventListener('click', () => {
